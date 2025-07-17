@@ -27,6 +27,72 @@ A **Java Spring Boot-based encrypted file storage and sharing platform** allowin
 - Deployment planned on Render/Railway
 
 ---
+🚀 API Testing (Swagger) – Instantly Test Encryptify
+Encryptify integrates Swagger UI so mentors can test endpoints immediately without additional setup.
+
+1️⃣ Access Swagger UI
+After starting your Spring Boot server:
+
+Open:
+
+bash
+Copy
+Edit
+http://localhost:8080/swagger-ui/index.html
+You will see all available Encryptify API endpoints for:
+
+User registration & login
+
+File encryption & decryption
+
+Key management, etc.
+
+2️⃣ Try Out Endpoints Instantly
+Click any endpoint ➔ “Try it out” ➔ Fill request fields ➔ Execute.
+
+Instantly view:
+
+Request URL & payload
+
+Response status & body
+
+Error messages for debugging.
+
+3️⃣ Authentication
+Encryptify uses JWT Authentication:
+
+Click the Authorize button (top-right on Swagger).
+
+Enter:
+
+php-template
+Copy
+Edit
+Bearer <your_jwt_token>
+To obtain a JWT:
+
+Call POST /api/auth/login with a registered user.
+
+Copy the token from the JSON response.
+
+Paste it into the Swagger Authorize popup.
+
+4️⃣ Testing Notes
+✅ Validate endpoints without Postman or curl.
+✅ Test encryption/decryption flows end-to-end.
+✅ Observe request/response formats for each API.
+✅ Check error handling and authentication flow easily.
+
+5️⃣ Optional: Add a Screenshot
+Add this in your docs/ folder and embed below:
+
+
+✅ Mentor Benefits
+Saves time verifying Encryptify’s functionality.
+
+Allows instant API testing during evaluation.
+
+Demonstrates delivery readiness for GSoC.
 
 ## ⚙️ Setup Instructions
 

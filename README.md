@@ -1,6 +1,6 @@
 # 🔐 Encryptify
 
-A **Java Spring Boot-based encrypted file storage and sharing platform** that allows users to upload, store, and share files securely using AES encryption and JWT-based authentication.
+A **Java Spring Boot-based encrypted file storage and sharing platform** allowing users to upload, store, and share files securely using AES encryption and JWT-based authentication.
 
 ---
 
@@ -11,22 +11,21 @@ A **Java Spring Boot-based encrypted file storage and sharing platform** that al
 ✅ Download files with on-the-fly decryption  
 ✅ File listing dashboard with filtering  
 ✅ Secure sharing via expiring token-based links  
-✅ REST API with integrated Swagger UI for instant testing  
+✅ REST API structure ready for frontend integration  
 ✅ MySQL database integration  
-✅ Ready for deployment on Render/Railway
+✅ Deployment readiness (Render, Railway)
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Java 17**
+- **Java 17 / 21**
 - **Spring Boot 3.x**
 - **Spring Security (JWT)**
 - **Spring Data JPA**
 - **MySQL**
 - **Java Cryptography (AES)**
-- **Swagger (springdoc-openapi)**
-- **Postman (for manual testing)**
+- **Postman (API testing)**
 
 ---
 
@@ -74,35 +73,6 @@ GET	/api/files/	List user files
 POST	/api/files/share/{id}	Generate secure share link
 GET	/api/files/share/{token}	Download via share link
 
-🚀 API Testing with Swagger
-Encryptify includes Swagger UI for instant API testing without Postman.
-
-1️⃣ Access Swagger UI:
-
-Open http://localhost:8080/swagger-ui/index.html after starting your server.
-
-2️⃣ Test Endpoints:
-
-Click “Try it out” on any endpoint.
-
-Fill in the request details and execute.
-
-Instantly view requests, payloads, and responses.
-
-3️⃣ Authentication:
-
-Click “Authorize” in Swagger.
-
-Enter:
-
-php-template
-Copy
-Edit
-Bearer <your_jwt_token>
-To obtain a token, call POST /api/auth/login with user credentials and copy the token from the response.
-
-✅ Validate encryption flows end-to-end, error handling, and authentication using Swagger easily.
-
 🚧 Roadmap
 ✅ Project setup and DB connection
 
@@ -133,21 +103,6 @@ Open a pull request or create an issue to discuss improvements.
 This project is licensed under the MIT License.
 
 ✨ Acknowledgements
-Built with ❤️ by Abhxay as part of backend Java portfolio projects for practical encryption, JWT, and Spring Boot architecture learning.
+Built with ❤️ by Abhxay as part of backend Java portfolio projects to learn practical encryption, JWT, and Spring Boot architecture.
 
-If you found this project helpful, feel free to ⭐️ star the repository to support the work!
-
-yaml
-Copy
-Edit
-
----
-
-✅ **Action:**  
-- Replace your current `README.md` with this version in your repo.  
-- Commit and push with:
-
-```bash
-git add README.md
-git commit -m "Clean and professional README for Encryptify"
-git push origin main
+⭐️ If you find this project helpful, please star the repository to support its growth!

@@ -1,41 +1,54 @@
+<p align="center">
+  <img src="weblogo.png" alt="Encryptify Logo" width="120"/>
+</p>
+
 # 🔐 Encryptify
 
-A **full-stack encrypted file manager**—securely upload, share, and manage files with an auditable sharing trail, built with React (frontend) and Spring Boot (backend).
+**Encryptify** is a full-stack encrypted file manager. Effortlessly upload, share, and manage files with end-to-end security and a full sharing/audit trail—built with React, Spring Boot, and JWT authentication.
+
+---
 
 ## 🚀 Features
 
-- **User Authentication:** Secure login & session management using JWT.
-- **Encrypted File Upload:** Safely upload files; data is securely handled server-side.
-- **Sharing:**  
-  - Share uploaded files with other users.
-  - Recipients see exactly who shared with them (with badge: e.g. `Shared by maya`).  
-  - Uploaders see files they shared out as `Shared by me`.
-- **Audit Logging:** Every action (upload, share, download, delete) is tracked and viewable in the "My Activity History" tab.
-- **Instant UI Updates:** React dashboard state syncs instantly after sharing or deleting files, with auto-updated stats and activity logs.
-- **User Dashboard:**  
-  - See total encrypted/uploaded files.
-  - "Shared" counter reflects files you have shared.
-  - Username badge at top for context.
-  - Visual badges in the file panel to clarify ownership and sharing.
-- **Responsive, Modern UI:**  
-  - Material UI.
-  - Equal-height main panels, smooth scroll, clear feedback via snackbars.
+- **User Authentication:** Secure login & registration via JWT tokens.
+- **Encrypted File Upload:** Upload and manage sensitive files securely.
+- **One-Click Sharing:**  
+  - Share files with other users and see instantly who each file was shared with or by.
+  - Clearly tagged files: `"Shared by you"` for files you've shared, `"Shared by [username]"` for incoming shares.
+- **Activity Logging:**  
+  - Audit log tracks uploads, downloads, shares, deletes—visible in a separate activity tab.
+- **Dashboard:**  
+  - Real-time, auto-updating counters for encrypted and shared files.
+  - Username chip, stats cards, and responsive design.
+  - Independent scrollable panels for files and audit activity.
+- **Modern UI:**  
+  - Material UI theme, beautiful layouts, color-coded actions, and professional icons.
+  - Fully themed with light/dark mode toggle and persistent theme preference.
+- **Robust Permissions:**  
+  - Only file owners can delete their files.
+  - Files shared with you indicate the sharing user.
+
+---
 
 ## 📸 Screenshots
 
-*(Insert demo screenshots/gifs here for "Your Files", "Shared by me", "Shared by maya/other", and the activity tab UI!)*
+> *(Add UI screenshots here)*  
+> Dashboard, audit log, file cards with "Shared by you", dark mode.
+
+---
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** React, Material UI
-- **Backend:** Spring Boot, Java 17+, Spring Security (JWT), Hibernate/JPA
-- **Database:** (e.g. H2, MySQL — configure as you prefer)
-- **APIs:** RESTful
-- **Other:** Maven/Gradle, Axios, etc
+- **Frontend:** React, Material UI, Axios
+- **Backend:** Spring Boot, Java 17+, Spring Security (JWT), JPA/Hibernate
+- **Database:** (Default H2; easily swapped for MySQL/Postgres)
+- **Build:** Maven, npm
 
-## ⚙️ Quick Start
+---
 
-### 1. Clone the repo
+## ⚙️ Getting Started
+
+### 1. Clone the Repo
 
 git clone https://github.com/Abhxay/Encryptify.git
 cd Encryptify
@@ -44,12 +57,12 @@ text
 
 ### 2. Backend Setup
 
-- Edit `/src/main/resources/application.properties` (DB URL, JWT secret, etc)
-- Build & run:
+- Edit `/src/main/resources/application.properties` to match your DB/JWT setup.
+- Build and run backend:
 ./mvnw spring-boot:run
 
+or use your IDE's run config
 text
-or use your preferred IDE.
 
 ### 3. Frontend Setup
 
@@ -58,38 +71,46 @@ npm install
 npm start
 
 text
+- App runs on `localhost:3000` (by default).
 
-- The app will run on `localhost:3000` by default.
+### 4. Production/Deployment
 
-### 4. Try It Out
+- **Build frontend:** `npm run build`
+- **Copy `/build` contents** (plus any static assets like `pic.png`, `weblogo.png`) into your backend’s `/src/main/resources/static/` directory.  
+- Restart your backend Spring Boot server.
 
-- Register or log in.
-- Upload files, share with other users, and see activity logs update in real time.
-- File panel badges clarify if files are "Shared by me" or "Shared by [username]".
+---
 
-## 💡 Architecture Overview
+## 💡 Architecture & Design
 
-- **Modular Back-end:** Clean separation of concerns, JPA entities, services, controllers.
-- **Extensible Audit:** Easily add new audit actions.
-- **Frontend UI/UX:** Designed for clarity, responsiveness, and a polished professional look.
-- **Robust Permission Logic:** Only uploaders (owners) can delete; unsharing removes shared access for the recipient only.
+- **Spring Security**: JWT token filter, stateless, secure endpoints.
+- **SPA Routing:** React with client-side routes (protected/private pages).
+- **Live State Sync:** Refresh logic (`refreshFlag`) means UI auto-updates on file changes.
+- **Customizable Theme:** Easily extendable Material-UI dark/light mode with persistent preference.
+- **Static Asset Handling:** Logos and favicon reliably load in all environments with robust static resource config.
+
+---
 
 ## 🙌 Contributing
 
-Pull requests and issues are welcome! See [`CONTRIBUTING.md`](CONTRIBUTING.md) if present, or open an issue to suggest features/fixes.
+- PRs and feedback are welcome!
+- Please open issues for bugs, features, or ideas.
+
+---
 
 ## 📚 License
 
-This project is open-source and available under the MIT License.
+[MIT License](LICENSE) © 2025 Abhxay
 
-## 💬 Find Me
+---
+
+## 👋 Connect
 
 - GitHub: [Abhxay](https://github.com/Abhxay)
-- LinkedIn: (add your link here for recruiters!)
+- LinkedIn: [Your LinkedIn](#) *(add your profile!)*
 
 ---
 
 **Tip:**  
-When you share on LinkedIn, include a few choice screenshots, highlight the sharing + audit log features, and link to this repo!
-
-If you want me to further add a setup FAQ, extended usage instructions, tech explanation, or recruiter-facing project summary, let me know!
+Showcase Encryptify on LinkedIn with screenshots and a link to this repo.  
+Hiring? Open to collaborating—send a message!

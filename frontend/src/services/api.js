@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8089', // Update if your backend runs elsewhere
+  baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8089',
 });
 
 api.interceptors.request.use((config) => {
@@ -9,5 +9,7 @@ api.interceptors.request.use((config) => {
   if (token) config.headers['Authorization'] = `Bearer ${token}`;
   return config;
 });
+
 api.clearMyAuditLogs = () => api.delete('/api/file/audit/clear');
+
 export default api;

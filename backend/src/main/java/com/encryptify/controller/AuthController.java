@@ -31,32 +31,25 @@ public class AuthController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    // Registration endpoint - JSON response with status codes
     @PostMapping("/register")
     public ResponseEntity<ApiResponse> register(@RequestBody User user) {
-        // -- Basic validation (adjust as necessary) --
         if (user.getUsername() == null || user.getUsername().isBlank()
                 || user.getPassword() == null || user.getPassword().isBlank()) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(new ApiResponse(false, "Username and password are required"));
         }
-
         Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
         if (existingUser.isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(new ApiResponse(false, "Username is already taken"));
         }
-
-        // Encode password and save
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-
         return ResponseEntity.ok(new ApiResponse(true, "User registered successfully"));
     }
 
-    // Login endpoint
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -65,52 +58,38 @@ public class AuthController {
                         loginRequest.getPassword()
                 )
         );
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtTokenProvider.generateToken(authentication);
-
         return ResponseEntity.ok(new JwtAuthResponse(token));
     }
-
-    // ------ RESPONSE CLASSES ------
-    // Must be static for JSON serialization
 
     public static class ApiResponse {
         private boolean success;
         private String message;
-
         public ApiResponse(boolean success, String message) {
             this.success = success;
             this.message = message;
         }
-
         public boolean isSuccess() { return success; }
         public String getMessage() { return message; }
     }
 
-    // Placeholder: implement this to match your JWT return structure
     public static class JwtAuthResponse {
         private String token;
-
         public JwtAuthResponse(String token) {
             this.token = token;
         }
-
         public String getToken() {
             return token;
         }
     }
 
-    // Placeholder: implement fields as needed
     public static class LoginRequest {
         private String username;
         private String password;
-
         public LoginRequest() {}
-
         public String getUsername() { return username; }
         public void setUsername(String username) { this.username = username; }
-
         public String getPassword() { return password; }
         public void setPassword(String password) { this.password = password; }
     }

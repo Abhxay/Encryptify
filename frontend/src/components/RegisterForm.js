@@ -32,8 +32,12 @@ function RegisterForm() {
       showMessage("Registration successful! Redirecting...", "success", () => {
         window.location.href = "/login";
       });
-    } catch {
-      showMessage("Registration failed. Try a different username.", "error");
+    } catch (err) {
+      let msg = "Registration failed. Try a different username.";
+      if (err.response && err.response.data && err.response.data.message) {
+        msg = err.response.data.message;
+      }
+      showMessage(msg, "error");
     }
   };
 

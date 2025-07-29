@@ -71,8 +71,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
-                "http://localhost:3000",                       // local dev
-                "https://encryptify-xxxx.onrender.com"         // <--- replace with ACTUAL frontend Render URL
+                "http://localhost:3000",                    // Local dev frontend URL
+                "https://encryptify-qk4n.onrender.com"      // <--- Replace with your actual deployed frontend URL
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));

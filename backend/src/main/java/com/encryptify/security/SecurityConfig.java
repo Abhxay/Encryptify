@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import java.util.List;
 
 @Configuration
@@ -40,19 +41,15 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                // Allow registration & login APIs unauthenticated
                                 "/api/auth/register", "/api/auth/login",
-                                // React build main entry and static assets (edit file names if needed)
                                 "/", "/index.html",
-                                "/*.js", "/*.css", "/*.png", "/*.ico", "/*.json", "/*.webmanifest",
                                 "/favicon.ico", "/manifest.json",
                                 "/logo192.png", "/logo512.png",
-                                "/pic.png", "/weblogo.png", // explicitly permit logo files!
+                                "/pic.png", "/weblogo.png",
                                 "/static/**",
-                                // Swagger docs/tools
                                 "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
                                 "/swagger-resources/**", "/webjars/**",
-                                "/{path:[^\\.]*}", "/**/{path:[^\\.]*}" // For SPA client routes
+                                "/{path:[^\\.]*}", "/**/{path:[^\\.]*}"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -66,13 +63,17 @@ public class SecurityConfig {
                         })
                         .permitAll()
                 );
+
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // Adjust for your frontend URL
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:3000",                       // local dev
+                "https://encryptify-xxxx.onrender.com"         // <--- replace with ACTUAL frontend Render URL
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

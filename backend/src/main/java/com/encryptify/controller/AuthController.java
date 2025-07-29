@@ -33,11 +33,19 @@ public class AuthController {
 
     // Registration endpoint - JSON response with status codes
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+    public ResponseEntity<ApiResponse> register(@RequestBody User user) {
+        // -- Basic validation (adjust as necessary) --
+        if (user.getUsername() == null || user.getUsername().isBlank()
+                || user.getPassword() == null || user.getPassword().isBlank()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse(false, "Username and password are required"));
+        }
+
         Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
         if (existingUser.isPresent()) {
-            // Return 409 Conflict status with descriptive message
-            return ResponseEntity.status(HttpStatus.CONFLICT)
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
                     .body(new ApiResponse(false, "Username is already taken"));
         }
 
@@ -48,9 +56,9 @@ public class AuthController {
         return ResponseEntity.ok(new ApiResponse(true, "User registered successfully"));
     }
 
-    // Login endpoint unchanged (assumes LoginRequest and JwtAuthResponse are defined)
+    // Login endpoint
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
@@ -64,7 +72,9 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthResponse(token));
     }
 
-    // ApiResponse helper class for JSON response
+    // ------ RESPONSE CLASSES ------
+    // Must be static for JSON serialization
+
     public static class ApiResponse {
         private boolean success;
         private String message;
@@ -76,5 +86,32 @@ public class AuthController {
 
         public boolean isSuccess() { return success; }
         public String getMessage() { return message; }
+    }
+
+    // Placeholder: implement this to match your JWT return structure
+    public static class JwtAuthResponse {
+        private String token;
+
+        public JwtAuthResponse(String token) {
+            this.token = token;
+        }
+
+        public String getToken() {
+            return token;
+        }
+    }
+
+    // Placeholder: implement fields as needed
+    public static class LoginRequest {
+        private String username;
+        private String password;
+
+        public LoginRequest() {}
+
+        public String getUsername() { return username; }
+        public void setUsername(String username) { this.username = username; }
+
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
     }
 }

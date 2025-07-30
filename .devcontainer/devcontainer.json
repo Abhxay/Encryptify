@@ -15,8 +15,31 @@
     "vscode": {
       "extensions": [
         "vscjava.vscode-java-pack",
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+        "esbenp.prettier-vscode", 
+        "dbaeumer.vscode-eslint"
       ]
     }
+  },
+  "remoteUser": "vscode",
+  "portsAttributes": {
+    "8089": {
+      "label": "Spring Boot Backend",
+      "onAutoForward": "notify"
+    },
+    "3000": {
+      "label": "React Frontend",
+      "onAutoForward": "notify"
+    },
+    "3306": {
+      "label": "MySQL",
+      "onAutoForward": "notify"
+    }
+  },
+  "workspaceFolder": "/workspaces/encryptify",
+  "containerEnv": {
+    "SPRING_DATASOURCE_URL": "jdbc:mysql://localhost:3306/encryptify?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",
+    "SPRING_DATASOURCE_USERNAME": "root",
+    "SPRING_DATASOURCE_PASSWORD": "Abhay23"
   }
 }

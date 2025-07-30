@@ -1,3 +1,4 @@
+ 
 version: '3.9'
 
 services:
@@ -6,7 +7,7 @@ services:
     volumes:
       - ..:/workspace:cached
     working_dir: /workspace
-    command: sleep infinity  # Keeps container running; use terminal to start backend/frontend
+    command: sleep infinity
     ports:
       - 8089:8089
       - 3000:3000

@@ -5,9 +5,9 @@
     "ghcr.io/devcontainers/features/node:1": {
       "version": "20"
     },
-    "ghcr.io/devcontainers/features/mysql:1": {
+    "ghcr.io/devcontainers/features/mysql:latest": {
       "version": "8"
-    }
+    }    
   },
   "postCreateCommand": "cd frontend && npm install && npm run build || true",
   "forwardPorts": [8089, 3000, 3306],

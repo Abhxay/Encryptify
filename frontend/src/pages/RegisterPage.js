@@ -28,22 +28,19 @@ export default function RegisterForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post("/api/auth/register", { username, password });
+      const res = await api.post("/auth/register", { username, password });
       if (res.data?.success) {
         showMessage(res.data.message, "success", () => {
           window.location.href = "/login";
         });
       } else {
-        // fallback generic message
         showMessage("Registration failed, please try again.", "error");
       }
     } catch (error) {
-      // Check if username conflict (409) and message matches expected
       if (error.response) {
         if (
           error.response.status === 409 ||
-          (error.response.data?.message &&
-            error.response.data.message.toLowerCase().includes("username"))
+          (error.response.data?.message && error.response.data.message.toLowerCase().includes("username"))
         ) {
           showMessage("Username is already taken. Please choose another.", "error");
         } else {

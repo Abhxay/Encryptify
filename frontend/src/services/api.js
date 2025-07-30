@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:8089", // base URL for all API calls
+  // Use relative path for API base URL to leverage Codespaces port forwarding
+  baseURL: process.env.REACT_APP_API_BASE_URL || "/api",
 });
 
 api.interceptors.request.use((config) => {
@@ -10,6 +11,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-api.clearMyAuditLogs = () => api.delete('/api/file/audit/clear');
+api.clearMyAuditLogs = () => api.delete('/file/audit/clear');
 
 export default api;

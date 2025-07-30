@@ -16,6 +16,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+@CrossOrigin(
+        origins = {
+                "http://localhost:3000",
+                "https://localhost:3000",
+                "http://127.0.0.1:3000",
+                // Add your Codespaces frontend URL here:
+                "https://turbo-bassoon-v666pxqxjj62wwg4-3000.app.github.dev",
+                "https://turbo-bassoon-v666pxqxjj62wwg4-8089.app.github.dev"
+        },
+        allowCredentials = "true"
+)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -33,20 +44,22 @@ public class AuthController {
     private JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse> register(@RequestBody User user) {
-        if (user.getUsername() == null || user.getUsername().isBlank()
-                || user.getPassword() == null || user.getPassword().isBlank()) {
+    public ResponseEntity<ApiResponse> register(@RequestBody RegisterRequest req) {
+        if (req.getUsername() == null || req.getUsername().isBlank()
+                || req.getPassword() == null || req.getPassword().isBlank()) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(new ApiResponse(false, "Username and password are required"));
         }
-        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
+        Optional<User> existingUser = userRepository.findByUsername(req.getUsername());
         if (existingUser.isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(new ApiResponse(false, "Username is already taken"));
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+        user.setUsername(req.getUsername());
+        user.setPassword(passwordEncoder.encode(req.getPassword()));
         userRepository.save(user);
         return ResponseEntity.ok(new ApiResponse(true, "User registered successfully"));
     }
@@ -78,49 +91,33 @@ public class AuthController {
             this.success = success;
             this.message = message;
         }
-
-        public boolean isSuccess() {
-            return success;
-        }
-
-        public String getMessage() {
-            return message;
-        }
+        public boolean isSuccess() { return success; }
+        public String getMessage() { return message; }
     }
 
     public static class JwtAuthResponse {
         private String token;
+        public JwtAuthResponse(String token) { this.token = token; }
+        public String getToken() { return token; }
+    }
 
-        public JwtAuthResponse(String token) {
-            this.token = token;
-        }
-
-        public String getToken() {
-            return token;
-        }
+    public static class RegisterRequest {
+        private String username;
+        private String password;
+        public RegisterRequest() {}
+        public String getUsername() { return username; }
+        public void setUsername(String username) { this.username = username; }
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
     }
 
     public static class LoginRequest {
         private String username;
         private String password;
-
-        public LoginRequest() {
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
+        public LoginRequest() {}
+        public String getUsername() { return username; }
+        public void setUsername(String username) { this.username = username; }
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
     }
 }

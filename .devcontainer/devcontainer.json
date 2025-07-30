@@ -36,7 +36,7 @@
       "onAutoForward": "notify"
     }
   },
-  "workspaceFolder": "/workspaces/encryptify",
+  "workspaceFolder": "/workspaces/Encryptify",
   "containerEnv": {
     "SPRING_DATASOURCE_URL": "jdbc:mysql://localhost:3306/encryptify?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",
     "SPRING_DATASOURCE_USERNAME": "root",

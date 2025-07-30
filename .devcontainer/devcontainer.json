@@ -1,15 +1,8 @@
 {
   "name": "Encryptify Dev Container",
-  "image": "mcr.microsoft.com/devcontainers/java",
-  "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "20"
-    },
-    "ghcr.io/devcontainers/features/mysql:latest": {
-      "version": "8"
-    }    
-  },
-  "postCreateCommand": "cd frontend && npm install && npm run build || true",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
   "forwardPorts": [8089, 3000, 3306],
   "customizations": {
     "vscode": {
@@ -21,25 +14,9 @@
       ]
     }
   },
-  "remoteUser": "vscode",
-  "portsAttributes": {
-    "8089": {
-      "label": "Spring Boot Backend",
-      "onAutoForward": "notify"
-    },
-    "3000": {
-      "label": "React Frontend",
-      "onAutoForward": "notify"
-    },
-    "3306": {
-      "label": "MySQL",
-      "onAutoForward": "notify"
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
     }
-  },
-  "workspaceFolder": "/workspaces/Encryptify",
-  "containerEnv": {
-    "SPRING_DATASOURCE_URL": "jdbc:mysql://localhost:3306/encryptify?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",
-    "SPRING_DATASOURCE_USERNAME": "root",
-    "SPRING_DATASOURCE_PASSWORD": "Abhay23"
   }
 }

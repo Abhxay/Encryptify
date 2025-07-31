@@ -135,7 +135,10 @@ Exposed Ports:
 
 Database credentials (for dev purposes only) are configured in docker-compose.yml. Please do not use these in production.
 
+
+
 🚀 Quick Start with GitHub Codespaces
+
 On GitHub, click the Code button and choose Open with Codespaces.
 
 Wait for the dev container to finish building (Java, Node.js, Maven, MySQL set up automatically).
@@ -148,7 +151,10 @@ The database (MySQL) runs in its own container on port 3306, with development cr
 
 You can develop, test, and run Encryptify end-to-end without any local setup—just code in your browser!
 
+
+
 🛡️ Security Considerations
+
 Do not commit real credentials: Avoid hardcoding passwords or secrets in your config files. Use .env files or GitHub/Codespaces secrets instead.
 
 Make sure your .gitignore includes:
@@ -165,6 +171,8 @@ target/
 *.class
 node_modules/
 Sensitive information like DB passwords (root/Abhay23 in dev) should be replaced with placeholders or environment variables before sharing.
+
+
 
 📜 React Frontend Info
 This React app was bootstrapped using Create React App, providing zero-config setup for modern web development.
@@ -186,13 +194,17 @@ Note: This is irreversible. Provides full control over build configs.
 
 For more details, see the official Create React App documentation.
 
+
+
 🙌 Contributing
 Contributions, bug reports, and feature requests are welcome!
 
 Please open issues or PRs if you want to help.
 
+
 📚 License
 MIT License © 2025 Abhxay
+
 
 👋 Connect
 GitHub: Abhxay

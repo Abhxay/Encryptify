@@ -29,11 +29,13 @@ export default function FileUpload({ refresh }) {
     }
     const formData = new FormData();
     Array.from(fileList).forEach((file) => {
+      // Make sure the form field name matches backend expectation, usually "files" or "file"
       formData.append("files", file);
     });
 
     try {
-      await api.post("/api/file/upload", formData, {
+      // IMPORTANT: your api.js baseURL is "/api", so here use "/file/upload" not "/api/file/upload"
+      await api.post("/file/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       showMessage("Upload successful!", "success");

@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Paper,
-  Stack,
-  Chip,
-} from "@mui/material";
+import { Box, Typography, Paper, Stack, Chip } from "@mui/material";
 import CloudDoneIcon from "@mui/icons-material/CloudDone";
 import FlareIcon from "@mui/icons-material/Flare";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -21,14 +15,15 @@ export default function Dashboard() {
 
   const username = localStorage.getItem("username") || "Unknown User";
 
-  // Toggle refreshFlag to indicate data should be reloaded
+  // Toggle refreshFlag to trigger child component reloads
   const triggerRefresh = () => setRefreshFlag((flag) => !flag);
 
   useEffect(() => {
     async function fetchCounts() {
       try {
-        const response = await api.get("/api/file/list");
-        const files = response.data;
+        // IMPORTANT: api.js has baseURL: "/api", so call endpoint directly under that (without extra /api/)
+        const response = await api.get("/file/list");
+        const files = Array.isArray(response.data) ? response.data : [];
         setEncryptedCount(files.length);
         setSharedCount(files.filter((f) => f.sharedByYou).length);
       } catch {
@@ -69,7 +64,7 @@ export default function Dashboard() {
           icon={<AccountCircleIcon />}
           label={username}
           size="medium"
-          color="#2DED21"
+          color="primary"
           sx={{
             position: "absolute",
             top: 16,
@@ -162,9 +157,9 @@ export default function Dashboard() {
           <Typography
             variant="overline"
             color="primary"
-            sx={{ letterSpacing: "0.2em", mb: 1, fontWeight: 700 }}>
-            
-            
+            sx={{ letterSpacing: "0.2em", mb: 1, fontWeight: 700 }}
+          >
+            Your Files
           </Typography>
           <FileUpload refresh={triggerRefresh} />
           <Box sx={{ mt: 3, flex: 1, overflowY: "auto" }}>
@@ -193,7 +188,7 @@ export default function Dashboard() {
             color="primary"
             sx={{ letterSpacing: "0.2em", mb: 1, fontWeight: 700 }}
           >
-          
+            Activity History
           </Typography>
           <AuditLogList refreshFlag={refreshFlag} />
         </Paper>
@@ -225,7 +220,11 @@ function StatsCard({ title, count, icon }) {
       <Typography variant="h4" component="span" color="primary.main" sx={{ mt: 1 }}>
         {count}
       </Typography>
-      <Typography variant="subtitle2" color="text.secondary" sx={{ letterSpacing: "0.1em", mt: 0.5, fontWeight: 600 }}>
+      <Typography
+        variant="subtitle2"
+        color="text.secondary"
+        sx={{ letterSpacing: "0.1em", mt: 0.5, fontWeight: 600 }}
+      >
         {title}
       </Typography>
     </Paper>

@@ -57,9 +57,9 @@ export default function AuditLogList({ refreshFlag }) {
     const fetchLogs = async () => {
       setLoading(true);
       try {
-        const res = await api.get("/api/file/audit/mine");
+        const res = await api.get("/file/audit/mine"); // api.js baseURL is "/api", so only "/file/audit/mine" here
         setLogs(Array.isArray(res.data) ? res.data.slice().reverse() : []);
-      } catch (error) {
+      } catch {
         setSnack({
           open: true,
           message: "Could not load activity history.",
@@ -80,7 +80,7 @@ export default function AuditLogList({ refreshFlag }) {
       await api.clearMyAuditLogs();
       setLogs([]);
       setSnack({ open: true, message: "Activity history cleared.", severity: "success" });
-    } catch (error) {
+    } catch {
       setSnack({ open: true, message: "Failed to clear activity history.", severity: "error" });
     } finally {
       setClearing(false);
@@ -131,8 +131,8 @@ export default function AuditLogList({ refreshFlag }) {
             sx={{ flex: 1, overflowY: "auto", pr: 1, maxHeight: "60vh" }}
             aria-label="List of user activity logs"
           >
-            {logs.map((log) => (
-              <React.Fragment key={log.id || log.timestamp || Math.random()}>
+            {logs.map((log, index) => (
+              <React.Fragment key={log.id || log.timestamp || index}>
                 <ListItem alignItems="flex-start" disableGutters>
                   <ListItemAvatar>
                     <Avatar
@@ -153,7 +153,12 @@ export default function AuditLogList({ refreshFlag }) {
                     }
                     secondary={
                       <>
-                        <Typography variant="body2" color="text.secondary" component="span" sx={{ wordBreak: "break-word" }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          component="span"
+                          sx={{ wordBreak: "break-word" }}
+                        >
                           {log.target || "N/A"}
                           {log.details ? ` — ${log.details}` : ""}
                         </Typography>
@@ -165,7 +170,7 @@ export default function AuditLogList({ refreshFlag }) {
                     sx={{ ml: 1 }}
                   />
                 </ListItem>
-                {logs.indexOf(log) < logs.length - 1 && <Divider component="li" />}
+                {index < logs.length - 1 && <Divider component="li" />}
               </React.Fragment>
             ))}
           </List>

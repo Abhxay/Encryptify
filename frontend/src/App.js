@@ -110,10 +110,11 @@ export default function App() {
       <CssBaseline />
       <Navbar darkMode={darkMode} toggleTheme={toggleTheme} />
       <Routes>
-        <Route path="/" element={isLoggedIn() ? <DashboardPage /> : <Navigate to="/login" replace />} />
-        <Route path="/login" element={!isLoggedIn() ? <LoginPage /> : <Navigate to="/" replace />} />
-        <Route path="/register" element={<RegisterPage />} />
-      </Routes>
+  <Route path="/" element={isLoggedIn() ? <DashboardPage /> : <RegisterPage />} />
+  <Route path="/login" element={!isLoggedIn() ? <LoginPage /> : <Navigate to="/" replace />} />
+  <Route path="/register" element={<RegisterPage />} />
+</Routes>
+
     </ThemeProvider>
   );
 }

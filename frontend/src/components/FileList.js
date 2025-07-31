@@ -34,7 +34,7 @@ export default function FileList({ refreshFlag, triggerRefresh }) {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const res = await api.get("/file/list");  // Corrected below note
+        const res = await api.get("/file/list");
         if (Array.isArray(res.data)) {
           setFiles(res.data);
         } else {
@@ -130,17 +130,36 @@ export default function FileList({ refreshFlag, triggerRefresh }) {
                     borderRadius: 3,
                     boxShadow: 1,
                     transition: "background 0.2s",
+                    overflow: "hidden", // prevent overflow at container level
                     "&:hover": { background: isDarkMode ? "#d6e6f2" : "#f1f3fc" },
                   }}
                 >
-                  <Stack direction="row" alignItems="center" spacing={2} flex={1}>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={2}
+                    flex={1}
+                    minWidth={0} // allow children to shrink within flex container
+                    sx={{ overflow: "hidden" }}
+                  >
                     <Avatar variant="rounded" sx={{ bgcolor: "#183eb0", width: 42, height: 42 }}>
                       <InsertDriveFileIcon sx={{ color: "#fff", fontSize: 28 }} />
                     </Avatar>
-                    <Box>
-                      <Typography fontWeight={700} sx={{ color: isDarkMode ? "#000" : "#222" }}>
-                        {file.filename}
-                      </Typography>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Tooltip title={file.filename} placement="top-start" arrow>
+                        <Typography
+                          fontWeight={700}
+                          sx={{
+                            color: isDarkMode ? "#000" : "#222",
+                            maxWidth: 180, // adjust width as needed
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {file.filename}
+                        </Typography>
+                      </Tooltip>
                       <Typography variant="caption" sx={{ color: isDarkMode ? "#333" : "#666" }}>
                         {new Date(file.uploadTimestamp).toLocaleString()} &nbsp;|&nbsp; {file.mimeType} &nbsp;|&nbsp;{" "}
                         {(file.sizeBytes / 1024).toFixed(1)} KB
@@ -158,7 +177,8 @@ export default function FileList({ refreshFlag, triggerRefresh }) {
                       )}
                     </Box>
                   </Stack>
-                  <Stack direction="row" spacing={0.5}>
+
+                  <Stack direction="row" spacing={0.5} flexShrink={0}>
                     <Tooltip title="Download">
                       <IconButton color="primary" size="large" onClick={() => handleDownload(file.filename)}>
                         <DownloadIcon />

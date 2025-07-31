@@ -59,26 +59,30 @@ export default function Dashboard() {
               : "linear-gradient(135deg, #e0f7fa 30%, #ffffff 100%)",
         }}
       >
-        {/* Username Badge */}
-        <Chip
-          icon={<AccountCircleIcon />}
-          label={username}
-          size="medium"
-          color="primary"
-          sx={{
-            position: "absolute",
-            top: 16,
-            right: 24,
-            fontWeight: 700,
-            bgcolor: "background.paper",
-            border: "1.5px solid",
-            borderColor: "primary.main",
-            px: 2,
-            py: "6px",
-            boxShadow: 1,
-          }}
-          aria-label="Logged-in username badge"
-        />
+      <Chip
+  icon={<AccountCircleIcon />}
+  label={username}
+  size="medium"
+  color="primary"
+  sx={{
+    position: "absolute",
+    top: 16,
+    right: 24,
+    fontWeight: 700,
+    bgcolor: "background.paper",
+    border: "1.5px solid",
+    borderColor: "primary.main",
+    px: 2,
+    py: "6px",
+    boxShadow: 1,
+    color: (theme) =>
+      theme.palette.mode === "dark"
+        ? theme.palette.text.primary 
+        : "#183eb0",                
+  }}
+  aria-label="Logged-in username badge"
+/>
+
         <Stack direction="row" alignItems="center" spacing={3}>
           {/* Dashboard logo */}
           <Box

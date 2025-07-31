@@ -5,35 +5,36 @@ Encryptify is a full-stack encrypted file manager. Effortlessly upload, share, a
 🚀 Features
 User Authentication: Secure login & registration via JWT tokens
 
-Encrypted File Upload: Upload and manage sensitive files securely
+Encrypted File Upload:
+                   Upload and manage sensitive files securely
 
 One-Click Sharing:
 
-Share files with other users and instantly see sharing details
+                Share files with other users and instantly see sharing details
 
-Tags like "Shared by you" and "Shared by [username]" for clarity
+                Tags like "Shared by you" and "Shared by [username]" for clarity
 
 Activity Logging:
 
-Audit log tracking uploads, downloads, shares, deletes—viewable in an activity tab
+           Audit log tracking uploads, downloads, shares, deletes—viewable in an activity tab
 
 Dashboard:
 
-Real-time counters for encrypted and shared files
+        Real-time counters for encrypted and shared files
 
-Username chip, stats cards, and responsive design
+        Username chip, stats cards, and responsive design
 
-Independent scrollable panels for file list and audit activities
+        Independent scrollable panels for file list and audit activities
 
 Modern UI:
 
-Material UI theme with light/dark mode toggle and persistent preferences
+         Material UI theme with light/dark mode toggle and persistent preferences
 
-Color-coded actions and professional icons
+         Color-coded actions and professional icons
 
 Robust Permissions:
 
-Only owners can delete files; shared files indicate owner info
+        Only owners can delete files; shared files indicate owner info
 
 📸 Screenshots
 

@@ -34,11 +34,18 @@ export default function FileList({ refreshFlag, triggerRefresh }) {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const res = await api.get("/api/file/list");
-        setFiles(res.data);
+        const res = await api.get("/file/list");  // Corrected below note
+        if (Array.isArray(res.data)) {
+          setFiles(res.data);
+        } else {
+          console.error("File list response is not an array", res.data);
+          setFiles([]);
+          showMessage("Unexpected data format received.", "warning");
+        }
       } catch (err) {
         console.error("Error fetching file list:", err);
         showMessage("Could not fetch files.", "error");
+        setFiles([]);
       }
     };
     fetchFiles();
@@ -46,7 +53,7 @@ export default function FileList({ refreshFlag, triggerRefresh }) {
 
   const handleDownload = async (filename) => {
     try {
-      const res = await api.get(`/api/file/download/${filename}`, { responseType: "blob" });
+      const res = await api.get(`/file/download/${filename}`, { responseType: "blob" });
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -63,8 +70,8 @@ export default function FileList({ refreshFlag, triggerRefresh }) {
 
   const handleDelete = async (id, shared) => {
     try {
-      if (shared) await api.delete(`/api/file/unshare/${id}`);
-      else await api.delete(`/api/file/delete/${id}`);
+      if (shared) await api.delete(`/file/unshare/${id}`);
+      else await api.delete(`/file/delete/${id}`);
       showMessage("Deleted!", "success");
       if (triggerRefresh) triggerRefresh();
     } catch (err) {
@@ -77,7 +84,7 @@ export default function FileList({ refreshFlag, triggerRefresh }) {
     const username = prompt("Enter username to share with");
     if (!username) return;
     try {
-      await api.post(`/api/file/share/${id}?username=${username}`);
+      await api.post(`/file/share/${id}?username=${username}`);
       showMessage(`File shared with ${username}!`, "info");
       if (triggerRefresh) triggerRefresh();
     } catch (err) {
@@ -105,87 +112,83 @@ export default function FileList({ refreshFlag, triggerRefresh }) {
 
       <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
         <Grid container spacing={2}>
-          {files.length === 0 && (
+          {files.length === 0 ? (
             <Typography sx={{ pl: 2, py: 4, color: isDarkMode ? "#ccc" : "#444" }}>
               No files uploaded or shared yet.
             </Typography>
+          ) : (
+            files.map((file) => (
+              <Grid item xs={12} key={file.id}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  spacing={2}
+                  sx={{
+                    p: 1.5,
+                    background: isDarkMode ? "#e6f1f6" : "#e7f5fa",
+                    borderRadius: 3,
+                    boxShadow: 1,
+                    transition: "background 0.2s",
+                    "&:hover": { background: isDarkMode ? "#d6e6f2" : "#f1f3fc" },
+                  }}
+                >
+                  <Stack direction="row" alignItems="center" spacing={2} flex={1}>
+                    <Avatar variant="rounded" sx={{ bgcolor: "#183eb0", width: 42, height: 42 }}>
+                      <InsertDriveFileIcon sx={{ color: "#fff", fontSize: 28 }} />
+                    </Avatar>
+                    <Box>
+                      <Typography fontWeight={700} sx={{ color: isDarkMode ? "#000" : "#222" }}>
+                        {file.filename}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: isDarkMode ? "#333" : "#666" }}>
+                        {new Date(file.uploadTimestamp).toLocaleString()} &nbsp;|&nbsp; {file.mimeType} &nbsp;|&nbsp;{" "}
+                        {(file.sizeBytes / 1024).toFixed(1)} KB
+                      </Typography>
+                      {file.sharedByYou && (
+                        <Chip label="Shared by me" color="secondary" size="small" sx={{ ml: 1, fontWeight: 700 }} />
+                      )}
+                      {file.sharedBy && (
+                        <Chip
+                          label={`Shared by ${file.sharedBy}`}
+                          color="info"
+                          size="small"
+                          sx={{ ml: 1, fontWeight: 700 }}
+                        />
+                      )}
+                    </Box>
+                  </Stack>
+                  <Stack direction="row" spacing={0.5}>
+                    <Tooltip title="Download">
+                      <IconButton color="primary" size="large" onClick={() => handleDownload(file.filename)}>
+                        <DownloadIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                      <IconButton color="error" size="large" onClick={() => handleDelete(file.id, !!file.sharedBy)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Share">
+                      <IconButton color="secondary" size="large" onClick={() => handleShare(file.id)}>
+                        <ShareIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Stack>
+                </Stack>
+              </Grid>
+            ))
           )}
-          {files.map((file) => (
-            <Grid item xs={12} key={file.id}>
-              <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                spacing={2}
-                sx={{
-                  p: 1.5,
-                  background: isDarkMode ? "#e6f1f6" : "#e7f5fa",
-                  borderRadius: 3,
-                  boxShadow: 1,
-                  transition: "background 0.2s",
-                  "&:hover": { background: isDarkMode ? "#d6e6f2" : "#f1f3fc" },
-                }}
-              >
-                <Stack direction="row" alignItems="center" spacing={2} flex={1}>
-                  <Avatar variant="rounded" sx={{ bgcolor: "#183eb0", width: 42, height: 42 }}>
-                    <InsertDriveFileIcon sx={{ color: "#fff", fontSize: 28 }} />
-                  </Avatar>
-                  <Box>
-                    <Typography fontWeight={700} sx={{ color: isDarkMode ? "#000" : "#222" }}>
-                      {file.filename}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: isDarkMode ? "#333" : "#666" }}>
-                      {new Date(file.uploadTimestamp).toLocaleString()} &nbsp;|&nbsp; {file.mimeType} &nbsp;|&nbsp;{" "}
-                      {(file.sizeBytes / 1024).toFixed(1)} KB
-                    </Typography>
-                    {file.sharedByYou && (
-                      <Chip
-                        label="Shared by me"
-                        color="secondary"
-                        size="small"
-                        sx={{ ml: 1, fontWeight: 700 }}
-                      />
-                    )}
-                    {file.sharedBy && (
-                      <Chip
-                        label={`Shared by ${file.sharedBy}`}
-                        color="info"
-                        size="small"
-                        sx={{ ml: 1, fontWeight: 700 }}
-                      />
-                    )}
-                  </Box>
-                </Stack>
-                <Stack direction="row" spacing={0.5}>
-                  <Tooltip title="Download">
-                    <IconButton color="primary" size="large" onClick={() => handleDownload(file.filename)}>
-                      <DownloadIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete">
-                    <IconButton color="error" size="large" onClick={() => handleDelete(file.id, !!file.sharedBy)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Share">
-                    <IconButton color="secondary" size="large" onClick={() => handleShare(file.id)}>
-                      <ShareIcon />
-                    </IconButton>
-                  </Tooltip>
-                </Stack>
-              </Stack>
-            </Grid>
-          ))}
         </Grid>
       </Box>
 
       <Snackbar
         open={snack.open}
         autoHideDuration={2000}
-        onClose={() => setSnack({ ...snack, open: false })}
+        onClose={() => setSnack((s) => ({ ...s, open: false }))}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert severity={snack.severity} variant="filled">
+        <Alert severity={snack.severity} variant="filled" onClose={() => setSnack((s) => ({ ...s, open: false }))}>
           {snack.message}
         </Alert>
       </Snackbar>

@@ -3,7 +3,7 @@
 Encryptify is a full-stack encrypted file manager. Effortlessly upload, share, and manage files with end-to-end security and maintain a full sharing and audit trail—built with React, Spring Boot, and JWT authentication.
 
 🚀 Features
-User Authentication: Secure login & registration via JWT tokens
+User Authentication: Secure login & registration via JWT tokens 
 
 Encrypted File Upload:
                    Upload and manage sensitive files securely

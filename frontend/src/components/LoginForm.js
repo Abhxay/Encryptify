@@ -28,15 +28,12 @@ function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post("/api/auth/login", { username, password });
+      const res = await api.post("/auth/login", { username, password });
       const { token, username: returnedUsername } = res.data;
-
-      // Store token and username in localStorage for persistence
       localStorage.setItem("token", token);
       localStorage.setItem("username", returnedUsername || username);
-
       showMessage("Login successful! Redirecting...", "success", () => {
-        window.location.href = "/"; // Redirect after success
+        window.location.href = "/";
       });
     } catch {
       showMessage("Login failed. Check your credentials.", "error");

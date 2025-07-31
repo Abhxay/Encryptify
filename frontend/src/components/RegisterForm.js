@@ -20,15 +20,15 @@ function RegisterForm() {
   const showMessage = (msg, severity = "success", cb) => {
     setSnack({ open: true, message: msg, severity });
     setTimeout(() => {
-      setSnack(s => ({ ...s, open: false }));
+      setSnack((s) => ({ ...s, open: false }));
       if (typeof cb === "function") cb();
     }, 2000);
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();  // Prevent browser form submission reload
+    e.preventDefault(); // Prevent browser form submission reload
     try {
-      await api.post("/api/auth/register", { username, password });
+      await api.post("/auth/register", { username, password });
       showMessage("Registration successful! Redirecting...", "success", () => {
         window.location.href = "/login";
       });
@@ -97,7 +97,7 @@ function RegisterForm() {
       </Card>
       <Snackbar
         open={snack.open}
-        onClose={() => setSnack(s => ({ ...s, open: false }))}
+        onClose={() => setSnack((s) => ({ ...s, open: false }))}
         autoHideDuration={2000}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >

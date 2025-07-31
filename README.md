@@ -36,7 +36,20 @@ Robust Permissions:
 Only owners can delete files; shared files indicate owner info
 
 📸 Screenshots
-![Dashboard](https://github.com/user-attachments/assets/93e58dd1-12b4-4e76-af6f-718a409e.com/user-attachments/assets/4f63b6a2-e1b2-4281-9238-8e](https://github.com/user-attachments/assets/f19b083a-d1d8-4a32-8eca-d46b9c1d6fc Stack
+
+The following screenshots showcase Encryptify in both Dark Mode and Light Mode:
+<img width="1919" height="933" alt="image" src="https://github.com/user-attachments/assets/955c08fc-eae7-4ed8-99ca-95873297506e" />
+<img width="1902" height="926" alt="image" src="https://github.com/user-attachments/assets/f1722f5f-14a8-4b71-ab41-3b7b808d323c" />
+
+light mode
+<img width="1919" height="931" alt="image" src="https://github.com/user-attachments/assets/31f1e30b-1f59-48b4-8379-1021947bbad0" />
+
+<img width="1889" height="926" alt="image" src="https://github.com/user-attachments/assets/4a86db56-4ca3-4d4f-9e89-cc167901d2da" />
+
+
+
+
+Stack
 
 Frontend: React, Material UI, Axios
 

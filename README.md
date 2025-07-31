@@ -1,6 +1,8 @@
 <p align="center"> <img src="weblogo.png" alt="Encryptify Logo" width="120"/> </p>
 🔐 Encryptify
+
 Encryptify is a full-stack encrypted file manager. Effortlessly upload, share, and manage files with end-to-end security and maintain a full sharing and audit trail—built with React, Spring Boot, and JWT authentication.
+
 
 🚀 Features
 User Authentication: Secure login & registration via JWT tokens 

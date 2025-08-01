@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Set;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -23,10 +24,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private CustomDetailServ customDetailServ;
 
+    // List all public endpoints to skip JWT authentication
+    private static final Set<String> PUBLIC_PATHS = Set.of(
+            "/api/auth/login",
+            "/api/auth/register",
+            "/favicon.ico",
+            "/manifest.json",
+            "/logo192.png",
+            "/logo512.png",
+            "/pic.png",
+            "/weblogo.png",
+            "/index.html"
+    );
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.equals("/api/auth/login") || path.equals("/api/auth/register");
+
+        // Exclude exact matches for public files
+        if (PUBLIC_PATHS.contains(path)) return true;
+
+        // Exclude static resources and Swagger, API docs, etc.
+        return path.startsWith("/static/")
+                || path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/swagger-resources")
+                || path.startsWith("/webjars");
     }
 
     @Override

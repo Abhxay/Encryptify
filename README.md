@@ -1,8 +1,11 @@
 <p align="center"> <img src="weblogo.png" alt="Encryptify Logo" width="120"/> </p>
 🔐 Encryptify
+
 Encryptify is a full-stack encrypted file manager. Effortlessly upload, share, and manage files with end-to-end security and maintain a full sharing and audit trail—built with React, Spring Boot, and JWT authentication.
 
+
 🚀 Features
+
 User Authentication: Secure login & registration via JWT tokens 
 
 Encrypted File Upload:
@@ -36,6 +39,8 @@ Robust Permissions:
 
         Only owners can delete files; shared files indicate owner info
 
+
+
 📸 Screenshots
 
 The following screenshots showcase Encryptify in both Dark Mode and Light Mode:
@@ -50,6 +55,8 @@ light mode
 
 
 
+
+
 Stack
 
 Frontend: React, Material UI, Axios
@@ -60,7 +67,10 @@ Database: Default H2; can switch easily to MySQL or PostgreSQL
 
 Build Tools: Maven (backend), npm (frontend)
 
+
+
 ⚙️ Getting Started
+
 Prerequisites
 Java 17+
 
@@ -106,6 +116,9 @@ Copy the contents of the generated /build folder (including any static assets li
 text
 src/main/resources/static/
 Restart the backend server after copying.
+
+
+
 
 💻 Development with GitHub Codespaces
 This project supports GitHub Codespaces for an easy-to-use, pre-configured development environment:
@@ -174,6 +187,7 @@ Sensitive information like DB passwords (root/Abhay23 in dev) should be replaced
 
 
 
+
 📜 React Frontend Info
 This React app was bootstrapped using Create React App, providing zero-config setup for modern web development.
 
@@ -196,14 +210,10 @@ For more details, see the official Create React App documentation.
 
 
 
-🙌 Contributing
-Contributions, bug reports, and feature requests are welcome!
-
-Please open issues or PRs if you want to help.
-
-
 📚 License
 MIT License © 2025 Abhxay
+
+
 
 
 👋 Connect

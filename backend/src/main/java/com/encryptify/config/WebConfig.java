@@ -13,11 +13,13 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://localhost:3000",
                         "https://localhost:3000",
                         "http://127.0.0.1:3000",
-                        // Add Codespaces URLs as needed
+                        // Codespaces/dev URLs
                         "https://turbo-bassoon-v666pxqxjj62wwg4-3000.app.github.dev",
-                        "https://turbo-bassoon-v666pxqxjj62wwg4-8089.app.github.dev"
+                        "https://turbo-bassoon-v666pxqxjj62wwg4-8089.app.github.dev",
+                        // Production frontend (Vercel)
+                        "https://encryptify-seven.vercel.app/"
                 )
-                .allowedMethods("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }

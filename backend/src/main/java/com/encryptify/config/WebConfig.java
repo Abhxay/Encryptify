@@ -17,7 +17,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "https://turbo-bassoon-v666pxqxjj62wwg4-3000.app.github.dev",
                         "https://turbo-bassoon-v666pxqxjj62wwg4-8089.app.github.dev",
                         // Production frontend (Vercel)
-                        "https://encryptify-seven.vercel.app/"
+                        "https://encryptify-ea6ywclxd-abhays-projects-7687137b.vercel.app"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")

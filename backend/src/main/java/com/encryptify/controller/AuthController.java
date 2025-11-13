@@ -18,10 +18,9 @@ import java.util.Optional;
 
 @CrossOrigin(
         origins = {
-                "http://localhost:3000",
                 "https://localhost:3000",
                 "http://127.0.0.1:3000",
-                // Add your Codespaces frontend URL here:
+               
                 "https://turbo-bassoon-v666pxqxjj62wwg4-3000.app.github.dev",
                 "https://turbo-bassoon-v666pxqxjj62wwg4-8089.app.github.dev"
         },

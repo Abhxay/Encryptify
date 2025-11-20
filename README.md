@@ -1,222 +1,149 @@
-<p align="center"> <img src="weblogo.png" alt="Encryptify Logo" width="120"/> </p>
-🔐 Encryptify
+<p align="center">
+<a href="https://www.google.com/search?q=https://github.com/Abhxay/Encryptify" target="_blank">
+<img src="weblogo.png" alt="Encryptify Logo" width="120"/>
+</a>
+<h1 align="center">🔐 Encryptify: Secure File Manager</h1>
+</p>
 
-Encryptify is a full-stack encrypted file manager. Effortlessly upload, share, and manage files with end-to-end security and maintain a full sharing and audit trail—built with React, Spring Boot, and JWT authentication.
+Encryptify is a full-stack, secure file management platform that allows users to effortlessly upload, share, and manage files with end-to-end security and a full sharing/audit trail.
 
+This project demonstrates strong capabilities in modern Java Backend Development, REST API security, and responsive Frontend design.
 
-🚀 Features
+💡 Key Features & Demonstrations
 
-User Authentication: Secure login & registration via JWT tokens 
+Feature Category
 
-Encrypted File Upload:
-                   Upload and manage sensitive files securely
+Description
 
-One-Click Sharing:
+Backend Stack Highlight
 
-                Share files with other users and instantly see sharing details
+🛡️ User Authentication
 
-                Tags like "Shared by you" and "Shared by [username]" for clarity
+Secure login and registration powered by JWT (JSON Web Tokens) for stateless authentication.
 
-Activity Logging:
+Spring Security
 
-           Audit log tracking uploads, downloads, shares, deletes—viewable in an activity tab
+🔒 Encrypted File Upload
 
-Dashboard:
+Upload and manage sensitive files with AES Algorithm encryption on the server side.
 
-        Real-time counters for encrypted and shared files
+Java Cryptography
 
-        Username chip, stats cards, and responsive design
+🔗 One-Click Sharing
 
-        Independent scrollable panels for file list and audit activities
+Easily share files with other users and instantly track sharing details and permissions.
 
-Modern UI:
+JPA/Hibernate Relations
 
-         Material UI theme with light/dark mode toggle and persistent preferences
+⏱️ Activity Logging
 
-         Color-coded actions and professional icons
+A complete Audit Trail tracks all user actions (uploads, downloads, shares, deletes) and is viewable in a dedicated tab.
 
-Robust Permissions:
+MySQL/H2 Persistance
 
-        Only owners can delete files; shared files indicate owner info
+💻 Modern UI/UX
 
+Responsive Dashboard with Material UI, stats cards, color-coded actions, and light/dark mode persistence.
 
+React, Material UI
+
+🛠️ Tech Stack
+
+Component
+
+Technologies
+
+Backend (API & Logic)
+
+Spring Boot (Java 17+), Spring Security (JWT), JPA/Hibernate
+
+Frontend (UI)
+
+React, Material UI, Axios
+
+Database
+
+Default H2 (in-memory) for development; easily switchable to MySQL or PostgreSQL.
+
+Build Tools
+
+Maven (Backend), npm (Frontend)
 
 📸 Screenshots
 
-The following screenshots showcase Encryptify in both Dark Mode and Light Mode:
-<img width="1919" height="933" alt="image" src="https://github.com/user-attachments/assets/955c08fc-eae7-4ed8-99ca-95873297506e" />
-<img width="1902" height="926" alt="image" src="https://github.com/user-attachments/assets/f1722f5f-14a8-4b71-ab41-3b7b808d323c" />
+The following screenshots showcase the Encryptify dashboard in both Dark Mode and Light Mode, highlighting the responsive design and activity log features.
 
-light mode
-<img width="1919" height="931" alt="image" src="https://github.com/user-attachments/assets/31f1e30b-1f59-48b4-8379-1021947bbad0" />
+Dark Mode
 
-<img width="1889" height="926" alt="image" src="https://github.com/user-attachments/assets/4a86db56-4ca3-4d4f-9e89-cc167901d2da" />
+Light Mode
 
+<img width="100%" alt="Encryptify Dark Mode Screenshot" src="https://github.com/user-attachments/assets/955c08fc-eae7-4ed8-99ca-95873297506e" />
 
+<img width="100%" alt="Encryptify Light Mode Screenshot" src="https://github.com/user-attachments/assets/31f1e30b-1f59-48b4-8379-1021947bbad0" />
 
+🚀 Getting Started
 
-
-
-Stack
-
-Frontend: React, Material UI, Axios
-
-Backend: Spring Boot, Java 17+, Spring Security (JWT), JPA/Hibernate
-
-Database: Default H2; can switch easily to MySQL or PostgreSQL
-
-Build Tools: Maven (backend), npm (frontend)
-
-
-
-⚙️ Getting Started
+This project is configured for a Quick Start using GitHub Codespaces (recommended) or a standard local setup.
 
 Prerequisites
+
 Java 17+
 
 Node.js 20+
 
 Maven
 
-Docker (optional, for dev container)
+Local Setup
 
-1. Clone the Repository
-bash
-git clone https://github.com/Abhxay/Encryptify.git
+Clone the Repository:
+
+git clone [https://github.com/Abhxay/Encryptify.git](https://github.com/Abhxay/Encryptify.git)
 cd Encryptify
-2. Backend Setup
-Edit the backend configuration file:
 
-text
-src/main/resources/application.properties
-Update your database connection and JWT secrets accordingly.
 
-To build and run the backend:
+Backend Setup (Spring Boot):
 
-bash
+Configuration: Edit src/main/resources/application.properties to update your database connection and JWT secrets (essential for security).
+
+Run:
+
 ./mvnw spring-boot:run
-OR run via your IDE’s Spring Boot run configuration.
 
-3. Frontend Setup
+
+Frontend Setup (React):
+
 Navigate to the frontend folder, install dependencies, and run:
 
-bash
 cd encryptify-frontend
 npm install
-npm start
-The frontend will launch at http://localhost:3000 by default.
-
-4. Production Build & Deployment
-Build the React frontend:
-
-bash
-npm run build
-Copy the contents of the generated /build folder (including any static assets like weblogo.png) into the backend’s static resources folder:
-
-text
-src/main/resources/static/
-Restart the backend server after copying.
+npm start  # Launches at http://localhost:3000
 
 
+⚙️ Development with GitHub Codespaces (Recommended)
 
+This project supports Codespaces for a zero-config, pre-configured development environment, ensuring you can start coding instantly in your browser.
 
-💻 Development with GitHub Codespaces
-This project supports GitHub Codespaces for an easy-to-use, pre-configured development environment:
+Setup: The dev container includes Node.js 20, Java 17, Maven, and MySQL (running on port 3306).
 
-Dev Container:
-Based on mcr.microsoft.com/devcontainers/java:21 image
+Ready: The Backend (Spring Boot) runs on Port 8089, and the Frontend (React) runs on Port 3000.
 
-Auto-installed VS Code Extensions:
+To launch, click the 'Code' button on the repository and select 'Open with Codespaces'.
 
-Java Pack (vscjava.vscode-java-pack)
+🛡️ Security Best Practices
 
-Docker (ms-azuretools.vscode-docker)
+Crucial Note: Never commit real credentials. Utilize environment variables or secrets management for sensitive data.
 
-Prettier (esbenp.prettier-vscode)
+Ensure your .gitignore includes: .env, *.env, target/, node_modules/, and any IDE-specific files.
 
-ESLint (dbaeumer.vscode-eslint)
+👋 Connect & License
 
-Installed tools: Node.js 20, Maven (installed post-create)
+Connect
 
-Exposed Ports:
+License
 
-8089: Spring Boot backend
-
-3000: React frontend
-
-3306: MySQL database
-
-Database credentials (for dev purposes only) are configured in docker-compose.yml. Please do not use these in production.
-
-
-
-🚀 Quick Start with GitHub Codespaces
-
-On GitHub, click the Code button and choose Open with Codespaces.
-
-Wait for the dev container to finish building (Java, Node.js, Maven, MySQL set up automatically).
-
-The backend (Spring Boot) will be running on port 8089.
-
-The frontend (React) runs on port 3000.
-
-The database (MySQL) runs in its own container on port 3306, with development credentials pre-configured.
-
-You can develop, test, and run Encryptify end-to-end without any local setup—just code in your browser!
-
-
-
-🛡️ Security Considerations
-
-Do not commit real credentials: Avoid hardcoding passwords or secrets in your config files. Use .env files or GitHub/Codespaces secrets instead.
-
-Make sure your .gitignore includes:
-
-text
-.env
-.env.*
-*.env
-docker-compose.override.yml
-mysql-data/
-.idea/
-.vscode/
-target/
-*.class
-node_modules/
-Sensitive information like DB passwords (root/Abhay23 in dev) should be replaced with placeholders or environment variables before sharing.
-
-
-
-
-📜 React Frontend Info
-This React app was bootstrapped using Create React App, providing zero-config setup for modern web development.
-
-Available Scripts
-From the frontend directory (encryptify-frontend), you can run:
-
-npm start
-Runs the app in development mode at http://localhost:3000.
-
-npm test
-Launches the test runner in interactive watch mode.
-
-npm run build
-Builds the app for production in the /build folder.
-
-npm run eject
-Note: This is irreversible. Provides full control over build configs.
-
-For more details, see the official Create React App documentation.
-
-
-
-📚 License
-MIT License © 2025 Abhxay
-
-
-
-
-👋 Connect
 GitHub: Abhxay
 
+License: MIT License © 2025 Abhxay
+
 LinkedIn: Abhay Thakur
+

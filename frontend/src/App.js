@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import Navbar from "./components/Navbar";
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
@@ -114,7 +115,7 @@ export default function App() {
   <Route path="/login" element={!isLoggedIn() ? <LoginPage /> : <Navigate to="/" replace />} />
   <Route path="/register" element={<RegisterPage />} />
 </Routes>
-
+      <Analytics />
     </ThemeProvider>
   );
 }

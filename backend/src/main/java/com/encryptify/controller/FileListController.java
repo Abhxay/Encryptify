@@ -32,7 +32,7 @@ public class FileListController {
             int sizeBytes,
             String uploadedBy,
             boolean sharedByYou,   // true if uploaded by current user and shared out
-            String sharedBy        // populated if uploaded by someone else and shared with current user
+            String sharedBy        //  if uploaded by someone else and shared with current user
     ) {}
 
     @GetMapping("/list")

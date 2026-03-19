@@ -16,16 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-@CrossOrigin(
-        origins = {
-                "https://localhost:3000",
-                "http://127.0.0.1:3000",
-               
-                "https://turbo-bassoon-v666pxqxjj62wwg4-3000.app.github.dev",
-                "https://turbo-bassoon-v666pxqxjj62wwg4-8089.app.github.dev"
-        },
-        allowCredentials = "true"
-)
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography, Button, Tooltip } from "@mui/material";
 import { isLoggedIn, logout } from "../utils/auth";
 import { useThemeMode } from "../App";
-import EncryptifyLogoFull, { EncryptifyMark } from "./EncryptifyLogo";
+import EncryptifyLogoFull from "./EncryptifyLogo";
 
 function SunIcon() {
   return (

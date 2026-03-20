@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Snackbar, Alert, Tooltip, Chip } from "@mui/material";
+import { Box, Typography, Snackbar, Alert, Tooltip } from "@mui/material";
 import api from "../services/api";
 
 const typeColor = (mime = "") => {

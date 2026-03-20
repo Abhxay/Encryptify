@@ -99,7 +99,7 @@ export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fon
       setEncrypted(false);
     } else {
       setEncrypted(true);
-      timerRef.current = setTimeout(() => setEncrypted(false), 2500);
+      timerRef.current = setTimeout(() => setEncrypted(false), 3500);
     }
   }, [encrypted]);
 
@@ -156,7 +156,7 @@ export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fon
           background: `linear-gradient(90deg, ${c1}, ${c2})`,
           boxShadow: `0 0 6px ${c1}88`,
           width: encrypted ? "100%" : "0%",
-          transition: "width 0.35s cubic-bezier(0.4,0,0.2,1)",
+          transition: encrypted ? "width 0.35s cubic-bezier(0.4,0,0.2,1)" : "none",
           zIndex: 3,
           pointerEvents: "none",
         }} />

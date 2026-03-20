@@ -2,6 +2,7 @@ import React, { useState, useMemo, createContext, useContext } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import Navbar from "./components/Navbar";
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
@@ -130,6 +131,17 @@ export default function App() {
     });
   };
 
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Navbar darkMode={darkMode} toggleTheme={toggleTheme} />
+      <Routes>
+  <Route path="/" element={isLoggedIn() ? <DashboardPage /> : <RegisterPage />} />
+  <Route path="/login" element={!isLoggedIn() ? <LoginPage /> : <Navigate to="/" replace />} />
+  <Route path="/register" element={<RegisterPage />} />
+</Routes>
+      <Analytics />
+    </ThemeProvider>
   const theme = useMemo(() => buildTheme(darkMode), [darkMode]);
 
   return (

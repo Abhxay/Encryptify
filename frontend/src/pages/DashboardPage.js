@@ -1,236 +1,134 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Paper, Stack, Chip } from "@mui/material";
-import CloudDoneIcon from "@mui/icons-material/CloudDone";
-import FlareIcon from "@mui/icons-material/Flare";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { Box, Typography, Paper } from "@mui/material";
 import FileUpload from "../components/FileUpload";
 import FileList from "../components/FileList";
 import AuditLogList from "../components/AuditLogList";
 import api from "../services/api";
 
-export default function Dashboard() {
+function StatCard({ value, label, color = "#7c3aed" }) {
+  return (
+    <Box sx={{
+      background: "rgba(255,255,255,0.025)",
+      border: "0.5px solid rgba(255,255,255,0.07)",
+      borderRadius: "12px", p: 2.5,
+      transition: "border-color 0.2s",
+      "&:hover": { borderColor: "rgba(124,58,237,0.3)" },
+    }}>
+      <Typography sx={{
+        fontFamily: "'Syne', sans-serif", fontWeight: 700,
+        fontSize: 28, color: "#f1f0ff", lineHeight: 1,
+      }}>
+        {value}
+      </Typography>
+      <Typography sx={{ fontSize: 11, color: "rgba(241,240,255,0.35)", mt: 0.5,
+        textTransform: "uppercase", letterSpacing: "0.08em", display: "flex", alignItems: "center", gap: 0.8 }}>
+        <Box component="span" sx={{ width: 5, height: 5, borderRadius: "50%", background: color, display: "inline-block" }} />
+        {label}
+      </Typography>
+    </Box>
+  );
+}
+
+export default function DashboardPage() {
   const [refreshFlag, setRefreshFlag] = useState(false);
   const [encryptedCount, setEncryptedCount] = useState(0);
   const [sharedCount, setSharedCount] = useState(0);
+  const [totalSize, setTotalSize] = useState("0 KB");
 
-  const username = localStorage.getItem("username") || "Unknown User";
+  const username = localStorage.getItem("username") || "there";
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
-  // Toggle refreshFlag to trigger child component reloads
-  const triggerRefresh = () => setRefreshFlag((flag) => !flag);
+  const triggerRefresh = () => setRefreshFlag(f => !f);
 
   useEffect(() => {
     async function fetchCounts() {
       try {
-        // IMPORTANT: api.js has baseURL: "/api", so call endpoint directly under that (without extra /api/)
-        const response = await api.get("/file/list");
-        const files = Array.isArray(response.data) ? response.data : [];
+        const res = await api.get("/file/list");
+        const files = Array.isArray(res.data) ? res.data : [];
         setEncryptedCount(files.length);
-        setSharedCount(files.filter((f) => f.sharedByYou).length);
-      } catch {
-        setEncryptedCount(0);
-        setSharedCount(0);
-      }
+        setSharedCount(files.filter(f => f.sharedByYou).length);
+        const bytes = files.reduce((sum, f) => sum + (f.sizeBytes || 0), 0);
+        setTotalSize(bytes > 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${(bytes / 1024).toFixed(0)} KB`);
+      } catch { /* silent */ }
     }
     fetchCounts();
   }, [refreshFlag]);
 
   return (
-    <Box
-      sx={{
-        maxWidth: 1300,
-        mx: "auto",
-        py: { xs: 2, md: 4 },
-        px: { xs: 2, md: 4 },
-        minHeight: "100vh",
-        bgcolor: "background.default",
-      }}
-    >
-      {/* Header Section */}
-      <Paper
-        elevation={12}
-        sx={{
-          p: { xs: 3, md: 5 },
-          mb: 5,
-          borderRadius: 3,
-          position: "relative",
-          background: (theme) =>
-            theme.palette.mode === "dark"
-              ? "linear-gradient(135deg, #1f1f2f 30%, #121212 100%)"
-              : "linear-gradient(135deg, #e0f7fa 30%, #ffffff 100%)",
-        }}
-      >
-      <Chip
-  icon={<AccountCircleIcon />}
-  label={username}
-  size="medium"
-  color="primary"
-  sx={{
-    position: "absolute",
-    top: 16,
-    right: 24,
-    fontWeight: 700,
-    bgcolor: "background.paper",
-    border: "1.5px solid",
-    borderColor: "primary.main",
-    px: 2,
-    py: "6px",
-    boxShadow: 1,
-    color: (theme) =>
-      theme.palette.mode === "dark"
-        ? theme.palette.text.primary 
-        : "#183eb0",                
-  }}
-  aria-label="Logged-in username badge"
-/>
+    <Box sx={{ minHeight: "100vh", background: "#080810" }}>
+      {/* Subtle background glow */}
+      <Box sx={{ position: "fixed", top: 0, left: "50%", transform: "translateX(-50%)",
+        width: 800, height: 400, pointerEvents: "none",
+        background: "radial-gradient(ellipse at top, rgba(124,58,237,0.08) 0%, transparent 70%)" }} />
 
-        <Stack direction="row" alignItems="center" spacing={3}>
-          {/* Dashboard logo */}
-          <Box
-            component="img"
-            src={process.env.PUBLIC_URL + "/weblogo.png"}
-            alt="Dashboard Logo"
-            sx={{
-              height: 70,
-              width: 70,
-              mr: 2.5,
-              borderRadius: 3,
-              boxShadow: 6,
-              bgcolor: "#fff",
-              p: 1,
-            }}
-          />
+      <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 2, md: 4 }, py: { xs: 3, md: 5 } }}>
+
+        {/* Header */}
+        <Box sx={{ mb: 4, display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 2 }}>
           <Box>
-            <Typography
-              variant="h3"
-              fontWeight={900}
-              color="primary.main"
-              gutterBottom
-              sx={{ letterSpacing: "-0.04em", lineHeight: 1 }}
-            >
-              Welcome to Encryptify
+            <Typography variant="h4" sx={{ color: "#f1f0ff", letterSpacing: "-0.02em", mb: 0.5 }}>
+              {greeting}, {username}
             </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-              Securely upload, share, and manage your encrypted files
+            <Typography sx={{ fontSize: 13, color: "rgba(241,240,255,0.35)" }}>
+              Your vault is secure · all files encrypted at rest
             </Typography>
           </Box>
-        </Stack>
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={{ xs: 2, sm: 4 }}
-          sx={{ mt: 4, maxWidth: { sm: 420 } }}
-        >
-          <StatsCard
-            title="Encrypted Files"
-            count={encryptedCount}
-            icon={<CloudDoneIcon fontSize="large" color="success" />}
-          />
-          <StatsCard
-            title="Files Shared"
-            count={sharedCount}
-            icon={<FlareIcon fontSize="large" color="warning" />}
-          />
-        </Stack>
-      </Paper>
-
-      {/* Main Panels */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          gap: 4,
-          alignItems: "stretch",
-          minHeight: { md: "70vh", xs: "auto" },
-          mb: 6,
-        }}
-      >
-        {/* Files Panel */}
-        <Paper
-          elevation={8}
-          sx={{
-            flex: "0 0 530px",
-            display: "flex",
-            flexDirection: "column",
-            p: 3,
-            bgcolor: "background.paper",
-            borderRadius: 3,
-            boxShadow: 4,
-            minWidth: 380,
-            height: { md: "100%", xs: "auto" },
-          }}
-        >
-          <Typography
-            variant="overline"
-            color="primary"
-            sx={{ letterSpacing: "0.2em", mb: 1, fontWeight: 700 }}
-          >
-            Your Files
-          </Typography>
-          <FileUpload refresh={triggerRefresh} />
-          <Box sx={{ mt: 3, flex: 1, overflowY: "auto" }}>
-            <FileList refreshFlag={refreshFlag} triggerRefresh={triggerRefresh} />
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ width: 7, height: 7, borderRadius: "50%", background: "#34d399",
+              boxShadow: "0 0 8px #34d399",
+              animation: "pulse 3s infinite",
+              "@keyframes pulse": { "0%,100%": { opacity: 1 }, "50%": { opacity: 0.4 } },
+            }} />
+            <Typography sx={{ fontSize: 12, color: "rgba(241,240,255,0.35)" }}>All systems operational</Typography>
           </Box>
-        </Paper>
+        </Box>
 
-        {/* Activity Panel */}
-        <Paper
-          elevation={8}
-          sx={{
-            width: 400,
-            flex: 1,
-            minWidth: 350,
-            bgcolor: "background.paper",
-            borderRadius: 3,
-            boxShadow: 4,
-            p: 3,
-            display: "flex",
-            flexDirection: "column",
-            height: { md: "100%", xs: "auto" },
-          }}
-        >
-          <Typography
-            variant="overline"
-            color="primary"
-            sx={{ letterSpacing: "0.2em", mb: 1, fontWeight: 700 }}
-          >
-            Activity History
-          </Typography>
-          <AuditLogList refreshFlag={refreshFlag} />
-        </Paper>
+        {/* Stats row */}
+        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 2, mb: 4 }}>
+          <StatCard value={encryptedCount} label="Encrypted files" color="#a78bfa" />
+          <StatCard value={sharedCount} label="Files shared" color="#38bdf8" />
+          <StatCard value={totalSize} label="Total size" color="#34d399" />
+        </Box>
+
+        {/* Main panels */}
+        <Box sx={{ display: "flex", flexDirection: { xs: "column", lg: "row" }, gap: 3, alignItems: "flex-start" }}>
+
+          {/* Files panel */}
+          <Box sx={{ flex: "0 0 auto", width: { xs: "100%", lg: "540px" } }}>
+            <Paper sx={{ borderRadius: "14px", overflow: "hidden" }}>
+              <Box sx={{ px: 3, pt: 3, pb: 1.5, borderBottom: "0.5px solid rgba(255,255,255,0.05)" }}>
+                <Typography sx={{ fontSize: 11, fontWeight: 500, color: "rgba(241,240,255,0.35)",
+                  textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                  Your vault
+                </Typography>
+              </Box>
+              <Box sx={{ p: 3, pt: 2 }}>
+                <FileUpload refresh={triggerRefresh} />
+                <Box sx={{ mt: 2.5 }}>
+                  <FileList refreshFlag={refreshFlag} triggerRefresh={triggerRefresh} />
+                </Box>
+              </Box>
+            </Paper>
+          </Box>
+
+          {/* Activity panel */}
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Paper sx={{ borderRadius: "14px", overflow: "hidden" }}>
+              <Box sx={{ px: 3, pt: 3, pb: 1.5, borderBottom: "0.5px solid rgba(255,255,255,0.05)" }}>
+                <Typography sx={{ fontSize: 11, fontWeight: 500, color: "rgba(241,240,255,0.35)",
+                  textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                  Activity
+                </Typography>
+              </Box>
+              <Box sx={{ p: 3, pt: 2 }}>
+                <AuditLogList refreshFlag={refreshFlag} />
+              </Box>
+            </Paper>
+          </Box>
+
+        </Box>
       </Box>
     </Box>
-  );
-}
-
-function StatsCard({ title, count, icon }) {
-  return (
-    <Paper
-      elevation={5}
-      sx={{
-        p: 3,
-        bgcolor: (theme) =>
-          theme.palette.mode === "dark"
-            ? "rgba(255,255,255,0.08)"
-            : "rgba(25, 118, 210, 0.1)",
-        borderRadius: 3,
-        boxShadow: 4,
-        flexGrow: 1,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 1.2,
-      }}
-    >
-      {icon}
-      <Typography variant="h4" component="span" color="primary.main" sx={{ mt: 1 }}>
-        {count}
-      </Typography>
-      <Typography
-        variant="subtitle2"
-        color="text.secondary"
-        sx={{ letterSpacing: "0.1em", mt: 0.5, fontWeight: 600 }}
-      >
-        {title}
-      </Typography>
-    </Paper>
   );
 }

@@ -1,139 +1,125 @@
 import React from "react";
-import {
-  AppBar,
-  Toolbar,
-  Box,
-  Typography,
-  Button,
-  IconButton,
-  Tooltip,
-  Fade,
-} from "@mui/material";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
-import LoginIcon from "@mui/icons-material/Person";
-import RegisterIcon from "@mui/icons-material/PersonAdd";
-import LogoutIcon from "@mui/icons-material/Logout";
+import { Box, Typography, Button } from "@mui/material";
 import { isLoggedIn, logout } from "../utils/auth";
 
-function Navbar({ toggleTheme, darkMode }) {
+export default function Navbar() {
   const handleLogout = () => {
     logout();
     window.location.href = "/login";
   };
 
+  const username = localStorage.getItem("username");
+
   return (
-    <AppBar
-      position="static"
-      elevation={8}
+    <Box
+      component="nav"
       sx={{
-        background: darkMode
-          ? "linear-gradient(90deg, #232b41 0%, #454595 100%)"
-          : "linear-gradient(90deg, #183eb0 0%, #13c2c2 100%)",
-        px: 2,
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        px: { xs: 3, md: 5 },
+        py: "14px",
+        background: "rgba(8,8,16,0.85)",
+        backdropFilter: "blur(12px)",
+        borderBottom: "0.5px solid rgba(255,255,255,0.06)",
       }}
     >
-      <Toolbar>
-        {/* NAVBAR LOGO: use pic.png */}
+      {/* Logo */}
+      <Box
+        sx={{ display: "flex", alignItems: "center", gap: 1.5, cursor: "pointer" }}
+        onClick={() => (window.location.href = "/")}
+      >
         <Box
-          component="img"
-          src={process.env.PUBLIC_URL + "/pic.png"}
-          alt="Navbar Logo"
           sx={{
-            height: 44,
-            width: 44,
-            mr: 2,
-            borderRadius: 2,
-            boxShadow: 3,
-            bgcolor: "#fff",
-            p: 0.5,
-            cursor: "pointer",
-            userSelect: "none",
-            transition: "box-shadow 0.2s",
-            "&:hover": { boxShadow: 6 },
+            width: 30,
+            height: 30,
+            borderRadius: "8px",
+            background: "linear-gradient(135deg, #7c3aed, #0ea5e9)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 0 14px rgba(124,58,237,0.4)",
           }}
-          onClick={() => window.location.href = "/"}
-          draggable={false}
-        />
+        >
+          <Typography sx={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 14, color: "#fff" }}>
+            E
+          </Typography>
+        </Box>
         <Typography
-          variant="h5"
-          component="div"
-          fontWeight={900}
           sx={{
-            color: "#fff",
-            userSelect: "none",
-            pointerEvents: "none",
-            letterSpacing: 2,
-            textShadow: "0 2px 8px #154a9e72",
-            display: { xs: "none", sm: "block" },
+            fontFamily: "'Syne', sans-serif",
+            fontWeight: 700,
+            fontSize: 16,
+            color: "#f1f0ff",
+            letterSpacing: "0.02em",
           }}
         >
           Encryptify
         </Typography>
-        <Box sx={{ flexGrow: 1 }} />
-        <Tooltip title={darkMode ? "Light mode" : "Dark mode"}>
-          <IconButton color="inherit" onClick={toggleTheme} sx={{ mx: 2 }}>
-            {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-          </IconButton>
-        </Tooltip>
-        {!isLoggedIn() && (
-          <Fade in>
-            <Box>
-              <Button
-                color="secondary"
-                startIcon={<LoginIcon />}
-                variant="contained"
-                href="/login"
-                sx={{
-                  m: 1,
-                  fontWeight: 700,
-                  bgcolor: "white",
-                  color: "primary.dark",
-                  "&:hover": { bgcolor: "secondary.light", scale: "1.06" },
-                }}
-              >
-                Login
-              </Button>
-              <Button
-                color="secondary"
-                startIcon={<RegisterIcon />}
-                variant="contained"
-                href="/register"
-                sx={{
-                  m: 1,
-                  fontWeight: 700,
-                  bgcolor: "white",
-                  color: "primary.dark",
-                  "&:hover": { bgcolor: "secondary.light", scale: "1.06" },
-                }}
-              >
-                Register
-              </Button>
-            </Box>
-          </Fade>
-        )}
-        {isLoggedIn() && (
-          <Fade in>
-            <Button
-              color="error"
-              startIcon={<LogoutIcon />}
-              variant="contained"
+      </Box>
+
+      {/* Right side */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+        {isLoggedIn() ? (
+          <>
+            <Box
               sx={{
-                m: 1,
-                fontWeight: 700,
-                bgcolor: "white",
-                color: "error.main",
-                "&:hover": { bgcolor: "error.light", scale: "1.06" },
+                px: 2,
+                py: "5px",
+                borderRadius: "20px",
+                background: "rgba(124,58,237,0.1)",
+                border: "0.5px solid rgba(124,58,237,0.25)",
+                display: { xs: "none", sm: "block" },
               }}
-              onClick={handleLogout}
             >
-              Logout
+              <Typography sx={{ fontSize: 12, color: "#a78bfa", fontWeight: 500 }}>{username}</Typography>
+            </Box>
+            <Button
+              onClick={handleLogout}
+              size="small"
+              sx={{
+                fontSize: 12,
+                color: "rgba(248,113,113,0.8)",
+                border: "0.5px solid rgba(248,113,113,0.2)",
+                borderRadius: "8px",
+                px: 2,
+                py: "5px",
+                "&:hover": { background: "rgba(248,113,113,0.08)", borderColor: "rgba(248,113,113,0.4)" },
+              }}
+            >
+              Sign out
             </Button>
-          </Fade>
+          </>
+        ) : (
+          <>
+            <Button
+              href="/login"
+              size="small"
+              sx={{
+                fontSize: 12,
+                color: "rgba(255,255,255,0.5)",
+                border: "0.5px solid rgba(255,255,255,0.1)",
+                borderRadius: "8px",
+                px: 2,
+                "&:hover": { background: "rgba(255,255,255,0.04)", color: "#fff" },
+              }}
+            >
+              Sign in
+            </Button>
+            <Button
+              href="/register"
+              size="small"
+              variant="contained"
+              sx={{ fontSize: 12, px: 2.5 }}
+            >
+              Get started
+            </Button>
+          </>
         )}
-      </Toolbar>
-    </AppBar>
+      </Box>
+    </Box>
   );
 }
-
-export default Navbar;

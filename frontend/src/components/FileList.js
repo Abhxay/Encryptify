@@ -1,217 +1,173 @@
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  CardContent,
-  Typography,
-  Stack,
-  Chip,
-  Avatar,
-  Snackbar,
-  Alert,
-  IconButton,
-  Tooltip,
-  Grid,
-  Box,
-} from "@mui/material";
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import DownloadIcon from "@mui/icons-material/Download";
-import DeleteIcon from "@mui/icons-material/Delete";
-import ShareIcon from "@mui/icons-material/Share";
-import { useTheme } from "@mui/material/styles";
+import { Box, Typography, Snackbar, Alert, Tooltip, Chip } from "@mui/material";
 import api from "../services/api";
 
-export default function FileList({ refreshFlag, triggerRefresh }) {
-  const theme = useTheme();
-  const isDarkMode = theme.palette.mode === "dark";
+const typeColor = (mime = "") => {
+  if (mime.includes("pdf")) return { bg: "rgba(248,113,113,0.1)", color: "#f87171", label: "PDF" };
+  if (mime.includes("image")) return { bg: "rgba(56,189,248,0.1)", color: "#38bdf8", label: "IMG" };
+  if (mime.includes("zip") || mime.includes("compressed")) return { bg: "rgba(167,139,250,0.1)", color: "#a78bfa", label: "ZIP" };
+  if (mime.includes("text")) return { bg: "rgba(52,211,153,0.1)", color: "#34d399", label: "TXT" };
+  if (mime.includes("word") || mime.includes("doc")) return { bg: "rgba(59,130,246,0.1)", color: "#60a5fa", label: "DOC" };
+  if (mime.includes("video")) return { bg: "rgba(251,191,36,0.1)", color: "#fbbf24", label: "VID" };
+  return { bg: "rgba(156,163,175,0.1)", color: "#9ca3af", label: "FILE" };
+};
 
+function FileCard({ file, onDownload, onDelete, onShare }) {
+  const [hovered, setHovered] = useState(false);
+  const type = typeColor(file.mimeType);
+  const sizeKB = ((file.sizeBytes || 0) / 1024).toFixed(1);
+
+  return (
+    <Box
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      sx={{
+        display: "flex", alignItems: "center", gap: 1.5,
+        p: "10px 12px", borderRadius: "10px",
+        border: "0.5px solid",
+        borderColor: hovered ? "rgba(124,58,237,0.25)" : "rgba(255,255,255,0.05)",
+        background: hovered ? "rgba(124,58,237,0.04)" : "rgba(255,255,255,0.02)",
+        transition: "all 0.15s ease", cursor: "default", mb: 1,
+      }}
+    >
+      {/* Type icon */}
+      <Box sx={{
+        width: 34, height: 34, borderRadius: "8px", flexShrink: 0,
+        background: type.bg, display: "flex", alignItems: "center",
+        justifyContent: "center",
+      }}>
+        <Typography sx={{ fontSize: 10, fontWeight: 700, color: type.color, letterSpacing: "0.05em" }}>
+          {type.label}
+        </Typography>
+      </Box>
+
+      {/* Info */}
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Tooltip title={file.filename} placement="top-start">
+          <Typography sx={{
+            fontSize: 13, color: "#f1f0ff", fontWeight: 500,
+            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+          }}>
+            {file.filename}
+            {file.sharedByYou && (
+              <Box component="span" sx={{
+                ml: 1, px: "6px", py: "1px", borderRadius: "4px", fontSize: 10,
+                background: "rgba(14,165,233,0.1)", border: "0.5px solid rgba(14,165,233,0.2)",
+                color: "#38bdf8", fontWeight: 500,
+              }}>shared</Box>
+            )}
+            {file.sharedBy && (
+              <Box component="span" sx={{
+                ml: 1, px: "6px", py: "1px", borderRadius: "4px", fontSize: 10,
+                background: "rgba(124,58,237,0.1)", border: "0.5px solid rgba(124,58,237,0.2)",
+                color: "#a78bfa", fontWeight: 500,
+              }}>from {file.sharedBy}</Box>
+            )}
+          </Typography>
+        </Tooltip>
+        <Typography sx={{ fontSize: 11, color: "rgba(241,240,255,0.3)", mt: "1px" }}>
+          {sizeKB} KB
+        </Typography>
+      </Box>
+
+      {/* Actions */}
+      <Box sx={{ display: "flex", gap: 0.5, opacity: hovered ? 1 : 0, transition: "opacity 0.15s" }}>
+        {[
+          { label: "↓", title: "Download", onClick: () => onDownload(file.filename), color: "#38bdf8" },
+          { label: "↗", title: "Share", onClick: () => onShare(file.id), color: "#a78bfa" },
+          { label: "×", title: "Delete", onClick: () => onDelete(file.id, !!file.sharedBy), color: "#f87171" },
+        ].map((action) => (
+          <Tooltip title={action.title} key={action.label}>
+            <Box
+              onClick={action.onClick}
+              sx={{
+                width: 26, height: 26, borderRadius: "6px", cursor: "pointer",
+                background: "rgba(255,255,255,0.04)", border: "0.5px solid rgba(255,255,255,0.08)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 13, color: "rgba(241,240,255,0.4)",
+                transition: "all 0.15s",
+                "&:hover": { background: "rgba(255,255,255,0.08)", color: action.color, borderColor: "rgba(255,255,255,0.15)" },
+              }}
+            >
+              {action.label}
+            </Box>
+          </Tooltip>
+        ))}
+      </Box>
+    </Box>
+  );
+}
+
+export default function FileList({ refreshFlag, triggerRefresh }) {
   const [files, setFiles] = useState([]);
   const [snack, setSnack] = useState({ open: false, message: "", severity: "success" });
 
-  const showMessage = (msg, severity = "success") => {
-    setSnack({ open: true, message: msg, severity });
-  };
+  const show = (msg, severity = "success") => setSnack({ open: true, message: msg, severity });
 
   useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        const res = await api.get("/file/list");
-        if (Array.isArray(res.data)) {
-          setFiles(res.data);
-        } else {
-          console.error("File list response is not an array", res.data);
-          setFiles([]);
-          showMessage("Unexpected data format received.", "warning");
-        }
-      } catch (err) {
-        console.error("Error fetching file list:", err);
-        showMessage("Could not fetch files.", "error");
-        setFiles([]);
-      }
-    };
-    fetchFiles();
+    api.get("/file/list")
+      .then(res => setFiles(Array.isArray(res.data) ? res.data : []))
+      .catch(() => show("Could not load files.", "error"));
   }, [refreshFlag]);
 
   const handleDownload = async (filename) => {
     try {
       const res = await api.get(`/file/download/${filename}`, { responseType: "blob" });
       const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", filename);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-      showMessage("Downloaded!", "success");
-    } catch (err) {
-      console.error("Error downloading file:", err);
-      showMessage("Download failed.", "error");
-    }
+      const a = document.createElement("a");
+      a.href = url; a.setAttribute("download", filename);
+      document.body.appendChild(a); a.click(); a.remove();
+      show("Downloaded successfully");
+    } catch { show("Download failed.", "error"); }
   };
 
   const handleDelete = async (id, shared) => {
     try {
       if (shared) await api.delete(`/file/unshare/${id}`);
       else await api.delete(`/file/delete/${id}`);
-      showMessage("Deleted!", "success");
-      if (triggerRefresh) triggerRefresh();
-    } catch (err) {
-      console.error("Error deleting file:", err);
-      showMessage("Delete failed.", "error");
-    }
+      show("Removed successfully");
+      triggerRefresh?.();
+    } catch { show("Delete failed.", "error"); }
   };
 
   const handleShare = async (id) => {
-    const username = prompt("Enter username to share with");
+    const username = prompt("Share with username:");
     if (!username) return;
     try {
       await api.post(`/file/share/${id}?username=${username}`);
-      showMessage(`File shared with ${username}!`, "info");
-      if (triggerRefresh) triggerRefresh();
-    } catch (err) {
-      console.error("Error sharing file:", err);
-      showMessage("Sharing failed.", "error");
-    }
+      show(`Shared with ${username}`);
+      triggerRefresh?.();
+    } catch { show("Share failed.", "error"); }
   };
 
-  return (
-    <Card
-      sx={{
-        p: 1,
-        bgcolor: "background.paper",
-        boxShadow: 6,
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <CardContent sx={{ pb: 1 }}>
-        <Typography variant="h6" fontWeight={800} sx={{ mb: 2, color: isDarkMode ? "#fff" : "#111" }}>
-          Your Files
+  if (files.length === 0) {
+    return (
+      <Box sx={{ py: 4, textAlign: "center" }}>
+        <Typography sx={{ fontSize: 13, color: "rgba(241,240,255,0.25)" }}>
+          No files yet. Upload your first file above.
         </Typography>
-      </CardContent>
-
-      <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
-        <Grid container spacing={2}>
-          {files.length === 0 ? (
-            <Typography sx={{ pl: 2, py: 4, color: isDarkMode ? "#ccc" : "#444" }}>
-              No files uploaded or shared yet.
-            </Typography>
-          ) : (
-            files.map((file) => (
-              <Grid item xs={12} key={file.id}>
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  spacing={2}
-                  sx={{
-                    p: 1.5,
-                    background: isDarkMode ? "#e6f1f6" : "#e7f5fa",
-                    borderRadius: 3,
-                    boxShadow: 1,
-                    transition: "background 0.2s",
-                    overflow: "hidden", // prevent overflow at container level
-                    "&:hover": { background: isDarkMode ? "#d6e6f2" : "#f1f3fc" },
-                  }}
-                >
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    spacing={2}
-                    flex={1}
-                    minWidth={0} // allow children to shrink within flex container
-                    sx={{ overflow: "hidden" }}
-                  >
-                    <Avatar variant="rounded" sx={{ bgcolor: "#183eb0", width: 42, height: 42 }}>
-                      <InsertDriveFileIcon sx={{ color: "#fff", fontSize: 28 }} />
-                    </Avatar>
-                    <Box sx={{ minWidth: 0 }}>
-                      <Tooltip title={file.filename} placement="top-start" arrow>
-                        <Typography
-                          fontWeight={700}
-                          sx={{
-                            color: isDarkMode ? "#000" : "#222",
-                            maxWidth: 180, // adjust width as needed
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {file.filename}
-                        </Typography>
-                      </Tooltip>
-                      <Typography variant="caption" sx={{ color: isDarkMode ? "#333" : "#666" }}>
-                        {new Date(file.uploadTimestamp).toLocaleString()} &nbsp;|&nbsp; {file.mimeType} &nbsp;|&nbsp;{" "}
-                        {(file.sizeBytes / 1024).toFixed(1)} KB
-                      </Typography>
-                      {file.sharedByYou && (
-                        <Chip label="Shared by me" color="secondary" size="small" sx={{ ml: 1, fontWeight: 700 }} />
-                      )}
-                      {file.sharedBy && (
-                        <Chip
-                          label={`Shared by ${file.sharedBy}`}
-                          color="info"
-                          size="small"
-                          sx={{ ml: 1, fontWeight: 700 }}
-                        />
-                      )}
-                    </Box>
-                  </Stack>
-
-                  <Stack direction="row" spacing={0.5} flexShrink={0}>
-                    <Tooltip title="Download">
-                      <IconButton color="primary" size="large" onClick={() => handleDownload(file.filename)}>
-                        <DownloadIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                      <IconButton color="error" size="large" onClick={() => handleDelete(file.id, !!file.sharedBy)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Share">
-                      <IconButton color="secondary" size="large" onClick={() => handleShare(file.id)}>
-                        <ShareIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Stack>
-                </Stack>
-              </Grid>
-            ))
-          )}
-        </Grid>
       </Box>
+    );
+  }
 
-      <Snackbar
-        open={snack.open}
-        autoHideDuration={2000}
-        onClose={() => setSnack((s) => ({ ...s, open: false }))}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert severity={snack.severity} variant="filled" onClose={() => setSnack((s) => ({ ...s, open: false }))}>
+  return (
+    <Box>
+      <Typography sx={{ fontSize: 11, color: "rgba(241,240,255,0.25)", mb: 1.5,
+        textTransform: "uppercase", letterSpacing: "0.08em" }}>
+        {files.length} file{files.length !== 1 ? "s" : ""}
+      </Typography>
+      {files.map(file => (
+        <FileCard key={file.id} file={file}
+          onDownload={handleDownload} onDelete={handleDelete} onShare={handleShare} />
+      ))}
+      <Snackbar open={snack.open} autoHideDuration={2000}
+        onClose={() => setSnack(s => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert severity={snack.severity} variant="filled"
+          onClose={() => setSnack(s => ({ ...s, open: false }))}>
           {snack.message}
         </Alert>
       </Snackbar>
-    </Card>
+    </Box>
   );
 }

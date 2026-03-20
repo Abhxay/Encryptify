@@ -1,133 +1,93 @@
 import React, { useRef, useState } from "react";
-import {
-  Card,
-  CardContent,
-  Button,
-  Stack,
-  Typography,
-  Snackbar,
-  Alert,
-  Box,
-} from "@mui/material";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { Box, Typography, Snackbar, Alert } from "@mui/material";
 import api from "../services/api";
 
 export default function FileUpload({ refresh }) {
   const [fileList, setFileList] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
   const [snack, setSnack] = useState({ open: false, message: "", severity: "success" });
   const fileInput = useRef();
 
-  const showMessage = (message, severity = "success") => {
-    setSnack({ open: true, message, severity });
-  };
+  const show = (message, severity = "success") => setSnack({ open: true, message, severity });
 
-  const handleUpload = async (e) => {
-    e.preventDefault();
-    if (!fileList.length) {
-      showMessage("No files selected!", "warning");
-      return;
-    }
+  const handleUpload = async () => {
+    if (!fileList.length) return;
     const formData = new FormData();
-    Array.from(fileList).forEach((file) => {
-      // Make sure the form field name matches backend expectation, usually "files" or "file"
-      formData.append("files", file);
-    });
-
+    Array.from(fileList).forEach(f => formData.append("files", f));
+    setUploading(true);
     try {
-      // IMPORTANT: your api.js baseURL is "/api", so here use "/file/upload" not "/api/file/upload"
-      await api.post("/file/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      showMessage("Upload successful!", "success");
+      await api.post("/file/upload", formData, { headers: { "Content-Type": "multipart/form-data" } });
+      show("Encrypted and uploaded successfully");
       setFileList([]);
-      if (refresh) refresh(); // Trigger parent refresh after upload
-    } catch (err) {
-      console.error("Upload failed:", err);
-      showMessage("Upload failed.", "error");
-    }
+      refresh?.();
+    } catch { show("Upload failed.", "error"); }
+    finally { setUploading(false); }
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
+    setDragOver(false);
     setFileList(e.dataTransfer.files);
   };
 
   return (
-    <Card sx={{ p: 0.5, bgcolor: "background.paper", boxShadow: 6 }}>
-      <CardContent>
-        <form onSubmit={handleUpload} autoComplete="off" encType="multipart/form-data">
-          <Stack spacing={2} alignItems="center">
-            <Box
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={handleDrop}
-              onClick={() => fileInput.current.click()}
-              sx={{
-                border: "2px dashed #13c2c2",
-                borderRadius: 3,
-                py: 3,
-                px: 2,
-                width: "100%",
-                background: "#f9fafb",
-                color: "primary.main",
-                cursor: "pointer",
-                textAlign: "center",
-                transition: "box-shadow 0.2s, background 0.2s",
-                "&:hover": {
-                  boxShadow: 3,
-                  background: "#e3f5f8",
-                },
-              }}
-            >
-              <CloudUploadIcon sx={{ fontSize: 46 }} />
-              <Typography fontWeight={700} color="primary.main">
-                Drag & drop files here, or click to select
-              </Typography>
-              <input
-                type="file"
-                name="files"
-                multiple
-                style={{ display: "none" }}
-                ref={fileInput}
-                onChange={(e) => setFileList(e.target.files)}
-              />
-              <Typography variant="caption">
-                {fileList.length
-                  ? Array.from(fileList)
-                      .map((f) => f.name)
-                      .join(", ")
-                  : "No files selected"}
-              </Typography>
-            </Box>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{
-                fontWeight: 700,
-                boxShadow: 2,
-                mt: 1,
-                "&:hover": { bgcolor: "primary.dark", transform: "scale(1.05)" },
-              }}
-              startIcon={<CloudUploadIcon />}
-              disabled={!fileList.length}
-            >
-              Upload
-            </Button>
-          </Stack>
-        </form>
-      </CardContent>
-
-      <Snackbar
-        open={snack.open}
-        autoHideDuration={2000}
-        onClose={() => setSnack({ ...snack, open: false })}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+    <Box>
+      <Box
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
+        onClick={() => fileInput.current.click()}
+        sx={{
+          border: "0.5px dashed",
+          borderColor: dragOver ? "#7c3aed" : "rgba(255,255,255,0.1)",
+          borderRadius: "10px", p: 3, textAlign: "center",
+          cursor: "pointer", transition: "all 0.2s",
+          background: dragOver ? "rgba(124,58,237,0.06)" : "rgba(255,255,255,0.02)",
+          "&:hover": { borderColor: "rgba(124,58,237,0.4)", background: "rgba(124,58,237,0.04)" },
+        }}
       >
-        <Alert severity={snack.severity} variant="filled">
+        <input type="file" multiple style={{ display: "none" }} ref={fileInput}
+          onChange={e => setFileList(e.target.files)} />
+        <Typography sx={{ fontSize: 20, mb: 1 }}>↑</Typography>
+        <Typography sx={{ fontSize: 13, color: "rgba(241,240,255,0.4)" }}>
+          Drop files or{" "}
+          <Box component="span" sx={{ color: "#a78bfa", fontWeight: 500 }}>browse</Box>
+        </Typography>
+        {fileList.length > 0 && (
+          <Typography sx={{ fontSize: 11, color: "#a78bfa", mt: 1, fontWeight: 500 }}>
+            {fileList.length} file{fileList.length > 1 ? "s" : ""} selected
+          </Typography>
+        )}
+      </Box>
+
+      {fileList.length > 0 && (
+        <Box
+          onClick={handleUpload}
+          sx={{
+            mt: 1.5, py: 1.2, borderRadius: "8px",
+            background: uploading ? "rgba(124,58,237,0.3)" : "linear-gradient(135deg, #7c3aed, #0ea5e9)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: uploading ? "not-allowed" : "pointer",
+            transition: "opacity 0.2s",
+            boxShadow: "0 0 20px rgba(124,58,237,0.2)",
+            "&:hover": { opacity: uploading ? 1 : 0.9 },
+          }}
+        >
+          <Typography sx={{ fontSize: 13, color: "#fff", fontWeight: 500 }}>
+            {uploading ? "Encrypting & uploading..." : `Upload ${fileList.length} file${fileList.length > 1 ? "s" : ""} →`}
+          </Typography>
+        </Box>
+      )}
+
+      <Snackbar open={snack.open} autoHideDuration={2000}
+        onClose={() => setSnack(s => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert severity={snack.severity} variant="filled"
+          onClose={() => setSnack(s => ({ ...s, open: false }))}>
           {snack.message}
         </Alert>
       </Snackbar>
-    </Card>
+    </Box>
   );
 }

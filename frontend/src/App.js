@@ -8,113 +8,110 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import { isLoggedIn } from "./utils/auth";
 
-const lightPalette = {
-  mode: "light",
-  primary: { main: "#183EB0", contrastText: "#fff" },
-  secondary: { main: "#13C2C2", contrastText: "#000" },
-  background: { default: "#f5f6fa", paper: "#fff" },
-  text: { primary: "#222222", secondary: "#555555" },
-};
+// Google Fonts injected globally
+const fontLink = document.createElement("link");
+fontLink.href =
+  "https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap";
+fontLink.rel = "stylesheet";
+document.head.appendChild(fontLink);
 
 const darkPalette = {
   mode: "dark",
-  primary: { main: "#90caf9", contrastText: "#000" },
-  secondary: { main: "#80deea", contrastText: "#000" },
-  background: { default: "#121212", paper: "#1e2a43" },
-  text: { primary: "#ffffff", secondary: "#b0bec5" },
-  divider: "rgba(255,255,255,0.12)",
+  primary: { main: "#7c3aed", light: "#a78bfa", dark: "#5b21b6", contrastText: "#fff" },
+  secondary: { main: "#0ea5e9", light: "#38bdf8", dark: "#0284c7", contrastText: "#fff" },
+  background: { default: "#080810", paper: "#0f0f1a" },
+  text: { primary: "#f1f0ff", secondary: "rgba(241,240,255,0.45)", disabled: "rgba(241,240,255,0.2)" },
+  divider: "rgba(255,255,255,0.06)",
+  error: { main: "#f87171" },
+  success: { main: "#34d399" },
+  info: { main: "#38bdf8" },
 };
 
 export default function App() {
-  const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem("darkMode");
-    return saved ? JSON.parse(saved) : false;
-  });
-
   const theme = useMemo(
     () =>
       createTheme({
-        palette: darkMode ? darkPalette : lightPalette,
-        shape: { borderRadius: 12 },
+        palette: darkPalette,
+        shape: { borderRadius: 10 },
         typography: {
-          fontFamily: "'Montserrat', 'Roboto', 'Arial', sans-serif",
-          h1: { fontWeight: 900, letterSpacing: "-0.02em" },
-          h2: { fontWeight: 800, letterSpacing: "-0.02em" },
-          h3: { fontWeight: 700 },
-          h5: { fontWeight: 700 },
-          button: { textTransform: "none", fontWeight: 600, letterSpacing: "0.03em" },
+          fontFamily: "'DM Sans', sans-serif",
+          h1: { fontFamily: "'Syne', sans-serif", fontWeight: 800 },
+          h2: { fontFamily: "'Syne', sans-serif", fontWeight: 700 },
+          h3: { fontFamily: "'Syne', sans-serif", fontWeight: 700 },
+          h4: { fontFamily: "'Syne', sans-serif", fontWeight: 600 },
+          h5: { fontFamily: "'Syne', sans-serif", fontWeight: 600 },
+          h6: { fontFamily: "'Syne', sans-serif", fontWeight: 600 },
+          button: { textTransform: "none", fontWeight: 500, fontFamily: "'DM Sans', sans-serif" },
         },
         components: {
+          MuiCssBaseline: {
+            styleOverrides: {
+              "*": { scrollbarWidth: "thin", scrollbarColor: "rgba(124,58,237,0.3) transparent" },
+              "*::-webkit-scrollbar": { width: "4px" },
+              "*::-webkit-scrollbar-thumb": { background: "rgba(124,58,237,0.3)", borderRadius: "4px" },
+              body: { background: "#080810" },
+            },
+          },
           MuiButton: {
             styleOverrides: {
               root: {
-                borderRadius: 24,
-                boxShadow: "none",
-                transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                "&:hover": {
-                  transform: "scale(1.05)",
-                  boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                borderRadius: 8,
+                fontFamily: "'DM Sans', sans-serif",
+                fontWeight: 500,
+                letterSpacing: "0.01em",
+                transition: "all 0.2s ease",
+              },
+              containedPrimary: {
+                background: "linear-gradient(135deg, #7c3aed 0%, #0ea5e9 100%)",
+                boxShadow: "0 0 20px rgba(124,58,237,0.25)",
+                "&:hover": { boxShadow: "0 0 28px rgba(124,58,237,0.4)", transform: "translateY(-1px)" },
+              },
+            },
+          },
+          MuiTextField: {
+            styleOverrides: {
+              root: {
+                "& .MuiOutlinedInput-root": {
+                  background: "rgba(255,255,255,0.03)",
+                  borderRadius: 8,
+                  fontFamily: "'DM Sans', sans-serif",
+                  "& fieldset": { borderColor: "rgba(255,255,255,0.08)" },
+                  "&:hover fieldset": { borderColor: "rgba(124,58,237,0.4)" },
+                  "&.Mui-focused fieldset": { borderColor: "#7c3aed", borderWidth: "1px" },
                 },
+                "& .MuiInputLabel-root": { fontFamily: "'DM Sans', sans-serif", color: "rgba(255,255,255,0.35)" },
+                "& .MuiInputLabel-root.Mui-focused": { color: "#a78bfa" },
               },
             },
           },
           MuiPaper: {
             styleOverrides: {
-              root: { transition: "background-color 0.3s ease" },
-            },
-          },
-          MuiAppBar: {
-            styleOverrides: {
-              colorPrimary: { transition: "background-color 0.3s ease" },
-            },
-          },
-          MuiTooltip: {
-            styleOverrides: {
-              tooltip: { fontSize: 14 },
+              root: {
+                backgroundImage: "none",
+                background: "#0f0f1a",
+                border: "0.5px solid rgba(255,255,255,0.06)",
+              },
             },
           },
           MuiChip: {
             styleOverrides: {
-              root: {
-                fontWeight: 700,
-                borderRadius: 8,
-                paddingLeft: 12,
-                paddingRight: 12,
-                textTransform: "capitalize",
-              },
-            },
-          },
-          MuiSnackbarContent: {
-            styleOverrides: {
-              root: {
-                borderRadius: 8,
-                boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-                fontWeight: 600,
-              },
+              root: { fontFamily: "'DM Sans', sans-serif", fontWeight: 500 },
             },
           },
         },
       }),
-    [darkMode]
+    []
   );
-
-  const toggleTheme = () => {
-    setDarkMode((prev) => {
-      localStorage.setItem("darkMode", JSON.stringify(!prev));
-      return !prev;
-    });
-  };
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Navbar darkMode={darkMode} toggleTheme={toggleTheme} />
+      <Navbar />
       <Routes>
-  <Route path="/" element={isLoggedIn() ? <DashboardPage /> : <RegisterPage />} />
-  <Route path="/login" element={!isLoggedIn() ? <LoginPage /> : <Navigate to="/" replace />} />
-  <Route path="/register" element={<RegisterPage />} />
-</Routes>
-
+        <Route path="/" element={isLoggedIn() ? <DashboardPage /> : <RegisterPage />} />
+        <Route path="/login" element={!isLoggedIn() ? <LoginPage /> : <Navigate to="/" replace />} />
+        <Route path="/register" element={<RegisterPage />} />
+      </Routes>
     </ThemeProvider>
   );
 }

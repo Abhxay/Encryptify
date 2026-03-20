@@ -99,7 +99,7 @@ export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fon
       setEncrypted(false);
     } else {
       setEncrypted(true);
-      timerRef.current = setTimeout(() => setEncrypted(false), 3500);
+      timerRef.current = setTimeout(() => setEncrypted(false), 6000);
     }
   }, [encrypted]);
 
@@ -118,6 +118,8 @@ export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fon
       <EncryptifyMark size={iconSize} darkMode={darkMode} encrypted={encrypted} />
 
       <div style={{ position: "relative", height: fontSize * 1.2, display: "flex", alignItems: "center" }}>
+
+        {/* Real wordmark */}
         <span style={{
           fontFamily: "'Syne', 'Arial Black', sans-serif",
           fontWeight: 800, fontSize, letterSpacing: "-0.01em",
@@ -133,6 +135,7 @@ export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fon
           Encryptify
         </span>
 
+        {/* Cipher wordmark */}
         <span style={{
           position: "absolute", left: 0, top: 0, bottom: 0,
           display: "flex", alignItems: "center",
@@ -141,7 +144,7 @@ export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fon
           fontSize: fontSize * 0.58,
           whiteSpace: "nowrap", letterSpacing: "0.05em",
           color: c1,
-          textShadow: `0 0 8px ${c1}88`,
+          textShadow: encrypted ? `0 0 8px ${c1}88` : "none",
           opacity: encrypted ? 1 : 0,
           transition: "opacity 0.3s ease",
           zIndex: 2,
@@ -149,14 +152,18 @@ export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fon
           {cipherWm || randHex(13)}
         </span>
 
+        {/* Strikethrough — opacity:0 when idle so theme-color changes are invisible */}
         <div style={{
           position: "absolute", left: 0, top: "50%",
           transform: "translateY(-50%)",
           height: 2, borderRadius: 1,
-          background: `linear-gradient(90deg, ${c1}, ${c2})`,
-          boxShadow: `0 0 6px ${c1}88`,
+          background: encrypted ? `linear-gradient(90deg, ${c1}, ${c2})` : "transparent",
+          boxShadow: encrypted ? `0 0 6px ${c1}88` : "none",
           width: encrypted ? "100%" : "0%",
-          transition: encrypted ? "width 0.35s cubic-bezier(0.4,0,0.2,1)" : "none",
+          opacity: encrypted ? 1 : 0,
+          transition: encrypted
+            ? "width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.1s ease"
+            : "none",
           zIndex: 3,
           pointerEvents: "none",
         }} />

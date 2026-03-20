@@ -70,7 +70,7 @@ export function EncryptifyMark({ size = 32, darkMode = true, encrypted = false }
         border: `0.5px solid rgba(${darkMode ? "167,139,250" : "109,40,217"},0.35)`,
         overflow: "hidden",
         opacity: encrypted ? 1 : 0,
-        transition: "opacity 0.3s ease",
+        transition: encrypted ? "opacity 0.3s ease, filter 0.3s ease" : "none",
         fontFamily: "'DM Mono', 'Courier New', monospace",
         fontSize: Math.round(size * 0.115),
         lineHeight: 1.2,
@@ -99,7 +99,7 @@ export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fon
       setEncrypted(false);
     } else {
       setEncrypted(true);
-      timerRef.current = setTimeout(() => setEncrypted(false), 50000);
+      timerRef.current = setTimeout(() => setEncrypted(false), 500000);
     }
   }, [encrypted]);
 
@@ -127,7 +127,7 @@ export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fon
           background: `linear-gradient(120deg, ${c1} 0%, ${c2} 100%)`,
           WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
           backgroundClip: "text",
-          transition: "opacity 0.3s ease, filter 0.3s ease",
+          transition: encrypted ? "opacity 0.3s ease, filter 0.3s ease" : "none",
           opacity: encrypted ? 0 : 1,
           filter: encrypted ? "blur(3px)" : "none",
           position: "relative", zIndex: 1,

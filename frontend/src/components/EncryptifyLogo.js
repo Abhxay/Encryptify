@@ -99,7 +99,7 @@ export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fon
       setEncrypted(false);
     } else {
       setEncrypted(true);
-      timerRef.current = setTimeout(() => setEncrypted(false), 6000);
+      timerRef.current = setTimeout(() => setEncrypted(false), 50000);
     }
   }, [encrypted]);
 
@@ -119,7 +119,7 @@ export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fon
 
       <div style={{ position: "relative", height: fontSize * 1.2, display: "flex", alignItems: "center" }}>
 
-        {/* Real wordmark */}
+        {/* Real wordmark — hidden when encrypted */}
         <span style={{
           fontFamily: "'Syne', 'Arial Black', sans-serif",
           fontWeight: 800, fontSize, letterSpacing: "-0.01em",
@@ -135,38 +135,45 @@ export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fon
           Encryptify
         </span>
 
-        {/* Cipher wordmark */}
-        <span style={{
-          position: "absolute", left: 0, top: 0, bottom: 0,
-          display: "flex", alignItems: "center",
-          fontFamily: "'DM Mono', 'Courier New', monospace",
-          fontWeight: 400,
-          fontSize: fontSize * 0.58,
-          whiteSpace: "nowrap", letterSpacing: "0.05em",
-          color: c1,
-          textShadow: encrypted ? `0 0 8px ${c1}88` : "none",
-          opacity: encrypted ? 1 : 0,
-          transition: "opacity 0.3s ease",
-          zIndex: 2,
-        }}>
-          {cipherWm || randHex(13)}
-        </span>
+        {/* Cipher wordmark — only rendered when encrypted */}
+        {encrypted && (
+          <span style={{
+            position: "absolute", left: 0, top: 0, bottom: 0,
+            display: "flex", alignItems: "center",
+            fontFamily: "'DM Mono', 'Courier New', monospace",
+            fontWeight: 400,
+            fontSize: fontSize * 0.58,
+            whiteSpace: "nowrap", letterSpacing: "0.05em",
+            color: c1,
+            textShadow: `0 0 8px ${c1}88`,
+            zIndex: 2,
+          }}>
+            {cipherWm || randHex(13)}
+          </span>
+        )}
 
-        {/* Strikethrough — opacity:0 when idle so theme-color changes are invisible */}
-        <div style={{
-          position: "absolute", left: 0, top: "50%",
-          transform: "translateY(-50%)",
-          height: 2, borderRadius: 1,
-          background: encrypted ? `linear-gradient(90deg, ${c1}, ${c2})` : "transparent",
-          boxShadow: encrypted ? `0 0 6px ${c1}88` : "none",
-          width: encrypted ? "100%" : "0%",
-          opacity: encrypted ? 1 : 0,
-          transition: encrypted
-            ? "width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.1s ease"
-            : "none",
-          zIndex: 3,
-          pointerEvents: "none",
-        }} />
+        {/* Strikethrough — only exists in DOM when encrypted, so theme changes can't affect it */}
+        {encrypted && (
+          <>
+            <style>{`
+              @keyframes strikeIn {
+                from { width: 0% }
+                to   { width: 100% }
+              }
+            `}</style>
+            <div style={{
+              position: "absolute", left: 0, top: "50%",
+              transform: "translateY(-50%)",
+              height: 2, borderRadius: 1,
+              background: `linear-gradient(90deg, ${c1}, ${c2})`,
+              boxShadow: `0 0 6px ${c1}88`,
+              animation: "strikeIn 0.35s cubic-bezier(0.4,0,0.2,1) forwards",
+              zIndex: 3,
+              pointerEvents: "none",
+            }} />
+          </>
+        )}
+
       </div>
     </div>
   );

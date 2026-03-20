@@ -1,12 +1,14 @@
 import React, { useRef, useState } from "react";
 import { Box, Typography, Snackbar, Alert } from "@mui/material";
 import api from "../services/api";
+import { useThemeMode } from "../App";
 
 export default function FileUpload({ refresh }) {
+  const { darkMode }    = useThemeMode();
   const [fileList, setFileList] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
-  const [snack, setSnack] = useState({ open: false, message: "", severity: "success" });
+  const [dragOver, setDragOver]   = useState(false);
+  const [snack, setSnack]         = useState({ open: false, message: "", severity: "success" });
   const fileInput = useRef();
 
   const show = (message, severity = "success") => setSnack({ open: true, message, severity });
@@ -22,7 +24,7 @@ export default function FileUpload({ refresh }) {
       setFileList([]);
       refresh?.();
     } catch { show("Upload failed.", "error"); }
-    finally { setUploading(false); }
+    finally   { setUploading(false); }
   };
 
   const handleDrop = (e) => {
@@ -31,31 +33,38 @@ export default function FileUpload({ refresh }) {
     setFileList(e.dataTransfer.files);
   };
 
+  const zoneBg = dragOver
+    ? "rgba(124,58,237,0.08)"
+    : darkMode ? "rgba(255,255,255,0.02)" : "rgba(124,58,237,0.02)";
+  const zoneBdr = dragOver
+    ? "#7c3aed"
+    : darkMode ? "rgba(255,255,255,0.12)" : "rgba(124,58,237,0.2)";
+  const textColor  = darkMode ? "rgba(241,240,255,0.4)"  : "rgba(13,11,30,0.45)";
+  const accentText = darkMode ? "#a78bfa"                : "#7c3aed";
+
   return (
     <Box>
       <Box
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragOver={e => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         onClick={() => fileInput.current.click()}
         sx={{
-          border: "0.5px dashed",
-          borderColor: dragOver ? "#7c3aed" : "rgba(255,255,255,0.1)",
+          border: "0.5px dashed", borderColor: zoneBdr,
           borderRadius: "10px", p: 3, textAlign: "center",
-          cursor: "pointer", transition: "all 0.2s",
-          background: dragOver ? "rgba(124,58,237,0.06)" : "rgba(255,255,255,0.02)",
-          "&:hover": { borderColor: "rgba(124,58,237,0.4)", background: "rgba(124,58,237,0.04)" },
+          cursor: "pointer", transition: "all 0.2s", background: zoneBg,
+          "&:hover": { borderColor: "#7c3aed", background: "rgba(124,58,237,0.05)" },
         }}
       >
         <input type="file" multiple style={{ display: "none" }} ref={fileInput}
           onChange={e => setFileList(e.target.files)} />
-        <Typography sx={{ fontSize: 20, mb: 1 }}>↑</Typography>
-        <Typography sx={{ fontSize: 13, color: "rgba(241,240,255,0.4)" }}>
+        <Typography sx={{ fontSize: 20, mb: 0.5, color: accentText }}>↑</Typography>
+        <Typography sx={{ fontSize: 13, color: textColor }}>
           Drop files or{" "}
-          <Box component="span" sx={{ color: "#a78bfa", fontWeight: 500 }}>browse</Box>
+          <Box component="span" sx={{ color: accentText, fontWeight: 500 }}>browse</Box>
         </Typography>
         {fileList.length > 0 && (
-          <Typography sx={{ fontSize: 11, color: "#a78bfa", mt: 1, fontWeight: 500 }}>
+          <Typography sx={{ fontSize: 11, color: accentText, mt: 0.8, fontWeight: 500 }}>
             {fileList.length} file{fileList.length > 1 ? "s" : ""} selected
           </Typography>
         )}
@@ -66,10 +75,9 @@ export default function FileUpload({ refresh }) {
           onClick={handleUpload}
           sx={{
             mt: 1.5, py: 1.2, borderRadius: "8px",
-            background: uploading ? "rgba(124,58,237,0.3)" : "linear-gradient(135deg, #7c3aed, #0ea5e9)",
+            background: uploading ? "rgba(124,58,237,0.3)" : "linear-gradient(135deg,#7c3aed,#0ea5e9)",
             display: "flex", alignItems: "center", justifyContent: "center",
             cursor: uploading ? "not-allowed" : "pointer",
-            transition: "opacity 0.2s",
             boxShadow: "0 0 20px rgba(124,58,237,0.2)",
             "&:hover": { opacity: uploading ? 1 : 0.9 },
           }}

@@ -104,7 +104,7 @@ export default function DashboardPage() {
           <StatCard value={encryptedCount} label="Encrypted files" accent="#a78bfa" darkMode={darkMode} />
           <StatCard value={sharedCount}    label="Files shared"    accent="#38bdf8" darkMode={darkMode} />
           <StatCard
-            value={storage ? `${storage.usedMB} MB` : "—"}
+            value={storage && storage.usedMB != null ? `${storage.usedMB} MB` : "— MB"}
             label="Storage used"
             accent={
               storage?.percentUsed >= 90 ? "#ef4444" :

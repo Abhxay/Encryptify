@@ -1,6 +1,7 @@
 package com.encryptify.controller;
 
 import com.encryptify.model.User;
+import com.encryptify.repository.FileRepository;
 import com.encryptify.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,60 +14,87 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 public class UserController {
 
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private FileRepository fileRepository;
+    @Autowired private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private static final long LIMIT_BYTES = 100L * 1024 * 1024; // 100 MB
 
+    // ── Storage info ──────────────────────────────────────────────────────────
+    @GetMapping("/storage")
+    public ResponseEntity<?> getStorageInfo(Authentication authentication) {
+        String username = authentication.getName();
+
+        // Sum sizeBytes for all files uploaded by this user
+        long usedBytes = fileRepository.findByUploadedByUsername(username)
+                .stream()
+                .mapToLong(f -> f.getSizeBytes() != null ? f.getSizeBytes() : 0L)
+                .sum();
+
+        int fileCount = fileRepository.findByUploadedByUsername(username).size();
+        double usedMB = usedBytes / (1024.0 * 1024.0);
+        double limitMB = LIMIT_BYTES / (1024.0 * 1024.0);
+        double percentUsed = (usedBytes * 100.0) / LIMIT_BYTES;
+
+        return ResponseEntity.ok(new StorageInfo(
+                usedBytes, Math.round(usedMB * 10.0) / 10.0,
+                fileCount, limitMB, Math.min(100.0, Math.round(percentUsed * 10.0) / 10.0)
+        ));
+    }
+
+    // ── Change username ───────────────────────────────────────────────────────
     @PatchMapping("/username")
     public ResponseEntity<?> changeUsername(
             @RequestBody ChangeUsernameRequest req,
             Authentication authentication) {
 
         String currentUsername = authentication.getName();
-
         if (req.getNewUsername() == null || req.getNewUsername().isBlank())
             return ResponseEntity.badRequest().body(new ApiResponse(false, "New username cannot be empty."));
-
         if (req.getNewUsername().trim().equals(currentUsername))
             return ResponseEntity.badRequest().body(new ApiResponse(false, "New username is the same as current."));
-
         if (userRepository.existsByUsername(req.getNewUsername().trim()))
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse(false, "Username already taken. Choose another."));
 
         User user = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         user.setUsername(req.getNewUsername().trim());
         userRepository.save(user);
-
         return ResponseEntity.ok(new ApiResponse(true, "Username updated successfully."));
     }
 
+    // ── Change password ───────────────────────────────────────────────────────
     @PatchMapping("/password")
     public ResponseEntity<?> changePassword(
             @RequestBody ChangePasswordRequest req,
             Authentication authentication) {
 
         String currentUsername = authentication.getName();
-
         if (req.getCurrentPassword() == null || req.getNewPassword() == null)
             return ResponseEntity.badRequest().body(new ApiResponse(false, "All password fields are required."));
-
         if (req.getNewPassword().length() < 6)
             return ResponseEntity.badRequest().body(new ApiResponse(false, "New password must be at least 6 characters."));
 
         User user = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         if (!passwordEncoder.matches(req.getCurrentPassword(), user.getPassword()))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Current password is incorrect."));
 
         user.setPassword(passwordEncoder.encode(req.getNewPassword()));
         userRepository.save(user);
-
         return ResponseEntity.ok(new ApiResponse(true, "Password updated successfully."));
+    }
+
+    // ── DTOs ──────────────────────────────────────────────────────────────────
+    public static class StorageInfo {
+        public long usedBytes;
+        public double usedMB;
+        public int fileCount;
+        public double limitMB;
+        public double percentUsed;
+        public StorageInfo(long ub, double um, int fc, double lm, double pu) {
+            usedBytes = ub; usedMB = um; fileCount = fc; limitMB = lm; percentUsed = pu;
+        }
     }
 
     public static class ChangeUsernameRequest {

@@ -4,16 +4,32 @@ import api from "../services/api";
 
 export default function StorageBar({ refreshFlag, darkMode }) {
   const [storage, setStorage] = useState(null);
+  const [error, setError]     = useState(false);
 
   useEffect(() => {
+    setError(false);
     api.get("/user/storage")
-      .then(res => setStorage(res.data))
-      .catch(() => {});
+      .then(res => {
+        // Defensive: ensure all fields are numbers
+        const d = res.data;
+        setStorage({
+          usedMB:     typeof d.usedMB     === "number" ? d.usedMB     : 0,
+          limitMB:    typeof d.limitMB    === "number" ? d.limitMB    : 100,
+          percentUsed:typeof d.percentUsed=== "number" ? d.percentUsed: 0,
+          fileCount:  typeof d.fileCount  === "number" ? d.fileCount  : 0,
+        });
+      })
+      .catch(() => setError(true));
   }, [refreshFlag]);
 
-  if (!storage) return null;
+  if (error || !storage) return null;
 
-  const pct     = storage.percentUsed;
+  const pct     = storage.percentUsed ?? 0;
+  const used    = storage.usedMB      ?? 0;
+  const limit   = storage.limitMB     ?? 100;
+  const count   = storage.fileCount   ?? 0;
+  const left    = Math.max(0, limit - used).toFixed(1);
+
   const color   = pct >= 90 ? "#ef4444" : pct >= 75 ? "#f59e0b" : "#10b981";
   const bgTrack = darkMode ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)";
   const textPri = darkMode ? "#f1f0ff"                : "#0d0b1e";
@@ -32,6 +48,7 @@ export default function StorageBar({ refreshFlag, darkMode }) {
       borderRadius: "12px",
       transition: "border-color 0.3s",
     }}>
+
       {/* Top row */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.2 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -40,27 +57,24 @@ export default function StorageBar({ refreshFlag, darkMode }) {
             Storage
           </Typography>
           {pct >= 90 && (
-            <Box sx={{
-              px: "6px", py: "1px", borderRadius: "4px", fontSize: 10,
+            <Box sx={{ px: "6px", py: "1px", borderRadius: "4px", fontSize: 10,
               background: "rgba(239,68,68,0.12)", border: "0.5px solid rgba(239,68,68,0.3)",
-              color: "#ef4444", fontWeight: 600,
-            }}>
+              color: "#ef4444", fontWeight: 600 }}>
               Almost full
             </Box>
           )}
           {pct >= 75 && pct < 90 && (
-            <Box sx={{
-              px: "6px", py: "1px", borderRadius: "4px", fontSize: 10,
+            <Box sx={{ px: "6px", py: "1px", borderRadius: "4px", fontSize: 10,
               background: "rgba(245,158,11,0.1)", border: "0.5px solid rgba(245,158,11,0.3)",
-              color: "#f59e0b", fontWeight: 600,
-            }}>
+              color: "#f59e0b", fontWeight: 600 }}>
               Running low
             </Box>
           )}
         </Box>
-        <Typography sx={{ fontSize: 12, color: textPri, fontFamily: "'DM Mono',monospace" }}>
-          {storage.usedMB} MB
-          <Box component="span" sx={{ color: textSec }}> / {storage.limitMB} MB</Box>
+        <Typography sx={{ fontSize: 12, color: textPri,
+          fontFamily: "'DM Mono','Courier New',monospace" }}>
+          {used} MB
+          <Box component="span" sx={{ color: textSec }}> / {limit} MB</Box>
         </Typography>
       </Box>
 
@@ -69,39 +83,43 @@ export default function StorageBar({ refreshFlag, darkMode }) {
         <Box sx={{
           height: "100%",
           width: `${Math.min(pct, 100)}%`,
+          minWidth: pct > 0 ? "4px" : "0px",
           background: pct >= 90
-            ? "linear-gradient(90deg, #ef4444, #dc2626)"
+            ? "linear-gradient(90deg,#ef4444,#dc2626)"
             : pct >= 75
-            ? "linear-gradient(90deg, #f59e0b, #d97706)"
-            : `linear-gradient(90deg, #10b981, ${color})`,
+            ? "linear-gradient(90deg,#f59e0b,#d97706)"
+            : "linear-gradient(90deg,#10b981,#34d399)",
           borderRadius: 3,
           transition: "width 0.6s ease, background 0.3s ease",
-          boxShadow: `0 0 6px ${color}66`,
+          boxShadow: pct > 0 ? `0 0 6px ${color}66` : "none",
         }} />
       </Box>
 
       {/* Bottom row */}
       <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
         <Typography sx={{ fontSize: 11, color: textSec }}>
-          {storage.fileCount} file{storage.fileCount !== 1 ? "s" : ""} uploaded
+          {count} file{count !== 1 ? "s" : ""} · {left} MB remaining
         </Typography>
-        <Typography sx={{ fontSize: 11, color: pct >= 75 ? color : textSec, fontWeight: pct >= 75 ? 500 : 400 }}>
-          {pct}% used
+        <Typography sx={{ fontSize: 11,
+          color: pct >= 75 ? color : textSec,
+          fontWeight: pct >= 75 ? 500 : 400,
+          fontFamily: "'DM Mono','Courier New',monospace",
+        }}>
+          {pct}%
         </Typography>
       </Box>
 
-      {/* Warning messages */}
       {pct >= 90 && (
         <Box sx={{ mt: 1.5, pt: 1.5, borderTop: "0.5px solid rgba(239,68,68,0.15)" }}>
           <Typography sx={{ fontSize: 11, color: "#f87171", lineHeight: 1.6 }}>
-            ⚠ Your vault is almost full. Delete some files to free up space. Max storage is {storage.limitMB} MB.
+            ⚠ Your vault is almost full. Delete some files to free up space. Max is {limit} MB.
           </Typography>
         </Box>
       )}
       {pct >= 75 && pct < 90 && (
         <Box sx={{ mt: 1.5, pt: 1.5, borderTop: "0.5px solid rgba(245,158,11,0.15)" }}>
           <Typography sx={{ fontSize: 11, color: "#fbbf24", lineHeight: 1.6 }}>
-            Storage is running low. You have {(storage.limitMB - storage.usedMB).toFixed(1)} MB remaining.
+            Storage is running low. You have {left} MB remaining.
           </Typography>
         </Box>
       )}

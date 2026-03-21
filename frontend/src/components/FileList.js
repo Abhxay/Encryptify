@@ -2,18 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Box, Typography, Snackbar, Alert, Tooltip } from "@mui/material";
 import api from "../services/api";
 import { useThemeMode } from "../App";
+import DeleteModal from "./DeleteModal";
 
 const typeColor = (mime = "") => {
-  if (mime.includes("pdf"))                          return { bg: "rgba(239,68,68,0.1)",   color: "#ef4444", label: "PDF" };
-  if (mime.includes("image"))                        return { bg: "rgba(14,165,233,0.1)",  color: "#0ea5e9", label: "IMG" };
-  if (mime.includes("zip") || mime.includes("compressed")) return { bg: "rgba(124,58,237,0.1)", color: "#7c3aed", label: "ZIP" };
-  if (mime.includes("text"))                         return { bg: "rgba(16,185,129,0.1)",  color: "#10b981", label: "TXT" };
-  if (mime.includes("word") || mime.includes("doc")) return { bg: "rgba(59,130,246,0.1)",  color: "#3b82f6", label: "DOC" };
-  if (mime.includes("video"))                        return { bg: "rgba(245,158,11,0.1)",  color: "#f59e0b", label: "VID" };
+  if (mime.includes("pdf"))                              return { bg: "rgba(239,68,68,0.1)",  color: "#ef4444", label: "PDF" };
+  if (mime.includes("image"))                            return { bg: "rgba(14,165,233,0.1)", color: "#0ea5e9", label: "IMG" };
+  if (mime.includes("zip") || mime.includes("compress")) return { bg: "rgba(124,58,237,0.1)",color: "#7c3aed", label: "ZIP" };
+  if (mime.includes("text"))                             return { bg: "rgba(16,185,129,0.1)", color: "#10b981", label: "TXT" };
+  if (mime.includes("word") || mime.includes("doc"))     return { bg: "rgba(59,130,246,0.1)", color: "#3b82f6", label: "DOC" };
+  if (mime.includes("video"))                            return { bg: "rgba(245,158,11,0.1)", color: "#f59e0b", label: "VID" };
   return { bg: "rgba(107,114,128,0.1)", color: "#6b7280", label: "FILE" };
 };
 
-function FileCard({ file, onDownload, onDelete, onShare, darkMode }) {
+function FileCard({ file, darkMode, onDownload, onDelete, onShare }) {
   const [hovered, setHovered] = useState(false);
   const type    = typeColor(file.mimeType);
   const sizeKB  = ((file.sizeBytes || 0) / 1024).toFixed(1);
@@ -34,8 +35,7 @@ function FileCard({ file, onDownload, onDelete, onShare, darkMode }) {
         display: "flex", alignItems: "center", gap: 1.5,
         p: "10px 12px", borderRadius: "10px",
         border: "0.5px solid", borderColor: cardBdr,
-        background: cardBg,
-        transition: "all 0.15s ease", mb: 1,
+        background: cardBg, transition: "all 0.15s ease", mb: 1,
       }}
     >
       {/* Type badge */}
@@ -51,26 +51,35 @@ function FileCard({ file, onDownload, onDelete, onShare, darkMode }) {
       {/* Info */}
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Tooltip title={file.filename} placement="top-start">
-          <Typography sx={{
-            fontSize: 13, color: textPri, fontWeight: 500,
-            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-          }}>
-            {file.filename}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "wrap" }}>
+            <Typography sx={{
+              fontSize: 13, color: textPri, fontWeight: 500,
+              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+              maxWidth: 160,
+            }}>
+              {file.filename}
+            </Typography>
+
+            {/* ── Shared badges ── */}
             {file.sharedByYou && (
-              <Box component="span" sx={{
-                ml: 1, px: "6px", py: "1px", borderRadius: "4px", fontSize: 10,
+              <Box sx={{
+                px: "6px", py: "1px", borderRadius: "4px", fontSize: 10,
                 background: "rgba(14,165,233,0.1)", border: "0.5px solid rgba(14,165,233,0.25)",
-                color: "#0ea5e9", fontWeight: 500,
-              }}>shared</Box>
+                color: "#0ea5e9", fontWeight: 500, flexShrink: 0,
+              }}>
+                shared
+              </Box>
             )}
             {file.sharedBy && (
-              <Box component="span" sx={{
-                ml: 1, px: "6px", py: "1px", borderRadius: "4px", fontSize: 10,
+              <Box sx={{
+                px: "6px", py: "1px", borderRadius: "4px", fontSize: 10,
                 background: "rgba(124,58,237,0.1)", border: "0.5px solid rgba(124,58,237,0.25)",
-                color: "#7c3aed", fontWeight: 500,
-              }}>from {file.sharedBy}</Box>
+                color: darkMode ? "#a78bfa" : "#7c3aed", fontWeight: 500, flexShrink: 0,
+              }}>
+                from {file.sharedBy}
+              </Box>
             )}
-          </Typography>
+          </Box>
         </Tooltip>
         <Typography sx={{ fontSize: 11, color: textSec, mt: "1px" }}>
           {sizeKB} KB
@@ -81,8 +90,8 @@ function FileCard({ file, onDownload, onDelete, onShare, darkMode }) {
       <Box sx={{ display: "flex", gap: 0.5, opacity: hovered ? 1 : 0, transition: "opacity 0.15s" }}>
         {[
           { label: "↓", title: "Download", onClick: () => onDownload(file.filename), hoverColor: "#0ea5e9" },
-          { label: "↗", title: "Share",    onClick: () => onShare(file.id),          hoverColor: "#7c3aed" },
-          { label: "×", title: "Delete",   onClick: () => onDelete(file.id, !!file.sharedBy), hoverColor: "#ef4444" },
+          ...(!file.sharedBy ? [{ label: "↗", title: "Share", onClick: () => onShare(file.id), hoverColor: "#7c3aed" }] : []),
+          { label: "×", title: "Delete", onClick: () => onDelete(file), hoverColor: "#ef4444" },
         ].map(action => (
           <Tooltip title={action.title} key={action.label}>
             <Box onClick={action.onClick} sx={{
@@ -108,8 +117,9 @@ function FileCard({ file, onDownload, onDelete, onShare, darkMode }) {
 
 export default function FileList({ refreshFlag, triggerRefresh }) {
   const { darkMode } = useThemeMode();
-  const [files, setFiles] = useState([]);
-  const [snack, setSnack] = useState({ open: false, message: "", severity: "success" });
+  const [files, setFiles]         = useState([]);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [snack, setSnack]         = useState({ open: false, message: "", severity: "success" });
 
   const show = (msg, severity = "success") => setSnack({ open: true, message: msg, severity });
 
@@ -130,15 +140,6 @@ export default function FileList({ refreshFlag, triggerRefresh }) {
     } catch { show("Download failed.", "error"); }
   };
 
-  const handleDelete = async (id, shared) => {
-    try {
-      if (shared) await api.delete(`/file/unshare/${id}`);
-      else        await api.delete(`/file/delete/${id}`);
-      show("Removed successfully");
-      triggerRefresh?.();
-    } catch { show("Delete failed.", "error"); }
-  };
-
   const handleShare = async (id) => {
     const username = prompt("Share with username:");
     if (!username) return;
@@ -147,6 +148,14 @@ export default function FileList({ refreshFlag, triggerRefresh }) {
       show(`Shared with ${username}`);
       triggerRefresh?.();
     } catch { show("Share failed. User may not exist.", "error"); }
+  };
+
+  const handleDeleted = (mode) => {
+    const msg = mode === "everyone"
+      ? "File deleted for everyone."
+      : "File removed from your vault.";
+    show(msg);
+    triggerRefresh?.();
   };
 
   const textSec = darkMode ? "rgba(241,240,255,0.25)" : "rgba(13,11,30,0.35)";
@@ -167,11 +176,27 @@ export default function FileList({ refreshFlag, triggerRefresh }) {
         textTransform: "uppercase", letterSpacing: "0.08em" }}>
         {files.length} file{files.length !== 1 ? "s" : ""}
       </Typography>
+
       {files.map(file => (
-        <FileCard key={file.id} file={file} darkMode={darkMode}
-          onDownload={handleDownload} onDelete={handleDelete} onShare={handleShare} />
+        <FileCard
+          key={file.id} file={file} darkMode={darkMode}
+          onDownload={handleDownload}
+          onDelete={(f) => setDeleteTarget(f)}
+          onShare={handleShare}
+        />
       ))}
-      <Snackbar open={snack.open} autoHideDuration={2000}
+
+      {/* Delete modal */}
+      {deleteTarget && (
+        <DeleteModal
+          file={deleteTarget}
+          darkMode={darkMode}
+          onClose={() => setDeleteTarget(null)}
+          onDeleted={handleDeleted}
+        />
+      )}
+
+      <Snackbar open={snack.open} autoHideDuration={2500}
         onClose={() => setSnack(s => ({ ...s, open: false }))}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}>
         <Alert severity={snack.severity} variant="filled"

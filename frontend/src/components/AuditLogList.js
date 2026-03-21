@@ -4,11 +4,25 @@ import api from "../services/api";
 import { useThemeMode } from "../App";
 
 const actionConfig = {
-  UPLOAD:   { icon: "↑", color: "#10b981", bg: "rgba(16,185,129,0.1)"  },
-  DOWNLOAD: { icon: "↓", color: "#0ea5e9", bg: "rgba(14,165,233,0.1)"  },
-  SHARE:    { icon: "↗", color: "#7c3aed", bg: "rgba(124,58,237,0.1)"  },
-  DELETE:   { icon: "×", color: "#ef4444", bg: "rgba(239,68,68,0.1)"   },
-  UNSHARE:  { icon: "↙", color: "#f59e0b", bg: "rgba(245,158,11,0.1)"  },
+  UPLOAD:               { icon: "↑", color: "#10b981", bg: "rgba(16,185,129,0.1)"  },
+  DOWNLOAD:             { icon: "↓", color: "#0ea5e9", bg: "rgba(14,165,233,0.1)"  },
+  SHARE:                { icon: "↗", color: "#7c3aed", bg: "rgba(124,58,237,0.1)"  },
+  RECEIVED:             { icon: "↙", color: "#a78bfa", bg: "rgba(167,139,250,0.1)" },
+  DELETE:               { icon: "×", color: "#ef4444", bg: "rgba(239,68,68,0.1)"   },
+  DELETED_FOR_EVERYONE: { icon: "✕", color: "#dc2626", bg: "rgba(220,38,38,0.12)"  },
+  FILE_REMOVED:         { icon: "!", color: "#f59e0b", bg: "rgba(245,158,11,0.1)"  },
+  UNSHARE:              { icon: "↩", color: "#6b7280", bg: "rgba(107,114,128,0.1)" },
+};
+
+const actionLabel = {
+  UPLOAD:               "Uploaded",
+  DOWNLOAD:             "Downloaded",
+  SHARE:                "Shared",
+  RECEIVED:             "Received",
+  DELETE:               "Deleted",
+  DELETED_FOR_EVERYONE: "Deleted for everyone",
+  FILE_REMOVED:         "File removed by owner",
+  UNSHARE:              "Removed",
 };
 
 function timeAgo(timestamp) {
@@ -24,9 +38,9 @@ function timeAgo(timestamp) {
 
 export default function AuditLogList({ refreshFlag }) {
   const { darkMode } = useThemeMode();
-  const [logs, setLogs]   = useState([]);
+  const [logs, setLogs]       = useState([]);
   const [loading, setLoading] = useState(true);
-  const [snack, setSnack] = useState({ open: false, message: "", severity: "info" });
+  const [snack, setSnack]     = useState({ open: false, message: "", severity: "info" });
 
   useEffect(() => {
     setLoading(true);
@@ -52,21 +66,17 @@ export default function AuditLogList({ refreshFlag }) {
   const divColor = darkMode ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.05)";
   const namePri  = darkMode ? "#f1f0ff"                : "#0d0b1e";
 
-  if (loading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-        <CircularProgress size={20} sx={{ color: "#7c3aed" }} />
-      </Box>
-    );
-  }
+  if (loading) return (
+    <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+      <CircularProgress size={20} sx={{ color: "#7c3aed" }} />
+    </Box>
+  );
 
-  if (logs.length === 0) {
-    return (
-      <Typography sx={{ fontSize: 13, color: textSec, py: 3, textAlign: "center" }}>
-        No activity yet.
-      </Typography>
-    );
-  }
+  if (logs.length === 0) return (
+    <Typography sx={{ fontSize: 13, color: textSec, py: 3, textAlign: "center" }}>
+      No activity yet.
+    </Typography>
+  );
 
   return (
     <Box>
@@ -75,9 +85,9 @@ export default function AuditLogList({ refreshFlag }) {
           {logs.length} event{logs.length !== 1 ? "s" : ""}
         </Typography>
         <Box onClick={handleClear} sx={{
-          fontSize: 11, color: darkMode ? "rgba(239,68,68,0.5)" : "rgba(220,38,38,0.6)",
-          cursor: "pointer",
-          "&:hover": { color: "#ef4444" }, transition: "color 0.15s",
+          fontSize: 11, cursor: "pointer", transition: "color 0.15s",
+          color: darkMode ? "rgba(239,68,68,0.5)" : "rgba(220,38,38,0.6)",
+          "&:hover": { color: "#ef4444" },
         }}>
           Clear all
         </Box>
@@ -85,6 +95,8 @@ export default function AuditLogList({ refreshFlag }) {
 
       {logs.map((log, i) => {
         const cfg = actionConfig[log.action] || { icon: "·", color: "#9ca3af", bg: "rgba(156,163,175,0.1)" };
+        const label = actionLabel[log.action] || log.action?.toLowerCase();
+
         return (
           <Box key={log.id || i} sx={{
             display: "flex", alignItems: "flex-start", gap: 1.5,
@@ -93,16 +105,15 @@ export default function AuditLogList({ refreshFlag }) {
           }}>
             <Box sx={{
               width: 26, height: 26, borderRadius: "7px", flexShrink: 0,
-              background: cfg.bg,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 12, color: cfg.color, mt: "1px",
+              background: cfg.bg, display: "flex", alignItems: "center",
+              justifyContent: "center", fontSize: 12, color: cfg.color, mt: "1px",
             }}>
               {cfg.icon}
             </Box>
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography sx={{ fontSize: 13, color: textPri }}>
-                <Box component="span" sx={{ color: cfg.color, fontWeight: 600, textTransform: "capitalize" }}>
-                  {log.action?.toLowerCase()}
+                <Box component="span" sx={{ color: cfg.color, fontWeight: 600 }}>
+                  {label}
                 </Box>
                 {" · "}
                 <Box component="span" sx={{
@@ -114,6 +125,11 @@ export default function AuditLogList({ refreshFlag }) {
                   {log.target}
                 </Box>
               </Typography>
+              {log.details && (
+                <Typography sx={{ fontSize: 11, color: textSec, mt: "1px" }}>
+                  {log.details}
+                </Typography>
+              )}
               <Typography sx={{ fontSize: 11, color: textSec, mt: "2px" }}>
                 {timeAgo(log.timestamp)}
               </Typography>

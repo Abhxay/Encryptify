@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 
 const CHARS = "0123456789abcdef";
-const randHex = (len) => Array.from({ length: len }, () => CHARS[Math.floor(Math.random() * 16)]).join("");
+const randHex = (len) =>
+  Array.from({ length: len }, () => CHARS[Math.floor(Math.random() * 16)]).join("");
 
-function useCipherText(active, length = 9, interval = 100) {
+function useCipherText(active, length = 13, interval = 110) {
   const [text, setText] = useState("");
   useEffect(() => {
     if (!active) { setText(""); return; }
@@ -27,21 +28,19 @@ function useIconCipher(active, interval = 80) {
 }
 
 export function EncryptifyMark({ size = 32, darkMode = true, encrypted = false }) {
-  const id  = `lg${size}${darkMode ? "d" : "l"}`;
-  const g1  = darkMode ? "#7c3aed" : "#6d28d9";
-  const g2  = darkMode ? "#0ea5e9" : "#0284c7";
-  const tc  = darkMode ? "#a78bfa" : "#6d28d9";
+  const id = `lg${size}${darkMode ? "d" : "l"}`;
+  const g1 = darkMode ? "#7c3aed" : "#6d28d9";
+  const g2 = darkMode ? "#0ea5e9" : "#0284c7";
+  const tc = darkMode ? "#a78bfa" : "#6d28d9";
   const iconLines = useIconCipher(encrypted, 80);
 
   return (
     <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
+
+      {/* Real SVG icon — no transition, just instant opacity so theme changes don't glitch */}
       <svg
         width={size} height={size} viewBox="0 0 72 72" fill="none"
-        style={{
-          transition: "opacity 0.3s ease, filter 0.3s ease",
-          opacity: encrypted ? 0 : 1,
-          filter: encrypted ? "blur(4px)" : "none",
-        }}
+        style={{ opacity: encrypted ? 0 : 1, filter: encrypted ? "blur(4px)" : "none" }}
       >
         <defs>
           <linearGradient id={`g_${id}`} x1="0" y1="0" x2="72" y2="72" gradientUnits="userSpaceOnUse">
@@ -63,25 +62,26 @@ export function EncryptifyMark({ size = 32, darkMode = true, encrypted = false }
         <polygon points="72,0 72,18 54,0" fill="rgba(0,0,0,0.14)" clipPath={`url(#c_${id})`}/>
       </svg>
 
-      <div style={{
-        position: "absolute", inset: 0,
-        borderRadius: Math.round(size * 0.27),
-        background: `rgba(${darkMode ? "124,58,237" : "109,40,217"},0.1)`,
-        border: `0.5px solid rgba(${darkMode ? "167,139,250" : "109,40,217"},0.35)`,
-        overflow: "hidden",
-        opacity: encrypted ? 1 : 0,
-        transition: encrypted ? "opacity 0.3s ease, filter 0.3s ease" : "none",
-        fontFamily: "'DM Mono', 'Courier New', monospace",
-        fontSize: Math.round(size * 0.115),
-        lineHeight: 1.2,
-        color: tc,
-        padding: Math.round(size * 0.07),
-        wordBreak: "break-all",
-        pointerEvents: "none",
-        letterSpacing: "0.02em",
-      }}>
-        {iconLines.join("\n")}
-      </div>
+      {/* Cipher overlay — only mounted when encrypting */}
+      {encrypted && (
+        <div style={{
+          position: "absolute", inset: 0,
+          borderRadius: Math.round(size * 0.27),
+          background: `rgba(${darkMode ? "124,58,237" : "109,40,217"},0.1)`,
+          border: `0.5px solid rgba(${darkMode ? "167,139,250" : "109,40,217"},0.35)`,
+          overflow: "hidden",
+          fontFamily: "'DM Mono','Courier New',monospace",
+          fontSize: Math.round(size * 0.115),
+          lineHeight: 1.2,
+          color: tc,
+          padding: Math.round(size * 0.07),
+          wordBreak: "break-all",
+          pointerEvents: "none",
+          letterSpacing: "0.02em",
+        }}>
+          {iconLines.join("\n")}
+        </div>
+      )}
     </div>
   );
 }
@@ -89,8 +89,8 @@ export function EncryptifyMark({ size = 32, darkMode = true, encrypted = false }
 export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fontSize = 16 }) {
   const [encrypted, setEncrypted] = useState(false);
   const timerRef = useRef(null);
-  const c1       = darkMode ? "#a78bfa" : "#6d28d9";
-  const c2       = darkMode ? "#38bdf8" : "#0284c7";
+  const c1 = darkMode ? "#a78bfa" : "#6d28d9";
+  const c2 = darkMode ? "#38bdf8" : "#0284c7";
   const cipherWm = useCipherText(encrypted, 13, 110);
 
   const handleClick = useCallback(() => {
@@ -99,7 +99,7 @@ export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fon
       setEncrypted(false);
     } else {
       setEncrypted(true);
-      timerRef.current = setTimeout(() => setEncrypted(false), 500000);
+      timerRef.current = setTimeout(() => setEncrypted(false), 50000);
     }
   }, [encrypted]);
 
@@ -117,57 +117,58 @@ export default function EncryptifyLogoFull({ iconSize = 30, darkMode = true, fon
     >
       <EncryptifyMark size={iconSize} darkMode={darkMode} encrypted={encrypted} />
 
-      <div style={{ position: "relative", height: fontSize * 1.2, display: "flex", alignItems: "center" }}>
+      <div style={{ position: "relative", height: fontSize * 1.4, display: "flex", alignItems: "center" }}>
 
-        {/* Real wordmark — hidden when encrypted */}
-        <span style={{
-          fontFamily: "'Syne', 'Arial Black', sans-serif",
-          fontWeight: 800, fontSize, letterSpacing: "-0.01em",
-          whiteSpace: "nowrap", lineHeight: 1,
-          background: `linear-gradient(120deg, ${c1} 0%, ${c2} 100%)`,
-          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
-          transition: encrypted ? "opacity 0.3s ease, filter 0.3s ease" : "none",
-          opacity: encrypted ? 0 : 1,
-          filter: encrypted ? "blur(3px)" : "none",
-          position: "relative", zIndex: 1,
-        }}>
-          Encryptify
-        </span>
-
-        {/* Cipher wordmark — only rendered when encrypted */}
-        {encrypted && (
+        {/* Real wordmark — NO transition, instant switch. Prevents theme-change glitch entirely */}
+        {!encrypted && (
           <span style={{
-            position: "absolute", left: 0, top: 0, bottom: 0,
-            display: "flex", alignItems: "center",
-            fontFamily: "'DM Mono', 'Courier New', monospace",
-            fontWeight: 400,
-            fontSize: fontSize * 0.58,
-            whiteSpace: "nowrap", letterSpacing: "0.05em",
-            color: c1,
-            textShadow: `0 0 8px ${c1}88`,
-            zIndex: 2,
+            fontFamily: "'Syne','Arial Black',sans-serif",
+            fontWeight: 800, fontSize,
+            letterSpacing: "-0.01em",
+            whiteSpace: "nowrap", lineHeight: 1,
+            background: `linear-gradient(120deg, ${c1} 0%, ${c2} 100%)`,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            position: "relative", zIndex: 1,
           }}>
-            {cipherWm || randHex(13)}
+            Encryptify
           </span>
         )}
 
-        {/* Strikethrough — only exists in DOM when encrypted, so theme changes can't affect it */}
+        {/* Encrypted state — only mounted when active, completely unmounted otherwise */}
         {encrypted && (
           <>
             <style>{`
-              @keyframes strikeIn {
-                from { width: 0% }
-                to   { width: 100% }
+              @keyframes enc-strike {
+                from { transform: scaleX(0); }
+                to   { transform: scaleX(1); }
               }
             `}</style>
+
+            {/* Cipher text replacing wordmark */}
+            <span style={{
+              fontFamily: "'DM Mono','Courier New',monospace",
+              fontWeight: 400,
+              fontSize: fontSize * 0.58,
+              whiteSpace: "nowrap",
+              letterSpacing: "0.05em",
+              color: c1,
+              textShadow: `0 0 8px ${c1}88`,
+              zIndex: 2,
+            }}>
+              {cipherWm || randHex(13)}
+            </span>
+
+            {/* Strikethrough — CSS animation, transform-origin left so it grows left→right */}
             <div style={{
               position: "absolute", left: 0, top: "50%",
               transform: "translateY(-50%)",
-              height: 2, borderRadius: 1,
+              height: 2, borderRadius: 1, width: "100%",
               background: `linear-gradient(90deg, ${c1}, ${c2})`,
               boxShadow: `0 0 6px ${c1}88`,
-              animation: "strikeIn 0.35s cubic-bezier(0.4,0,0.2,1) forwards",
+              transformOrigin: "left center",
+              animation: "enc-strike 0.35s cubic-bezier(0.4,0,0.2,1) forwards",
               zIndex: 3,
               pointerEvents: "none",
             }} />
